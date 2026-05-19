@@ -25,7 +25,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import ui from '../assets/mera.png';
@@ -326,57 +326,8 @@ const PurchaseOrderActions = () => {
   };
 
   return (
-    <Box display="flex">
-      <Sidebar />
-      <Box flex={1} display="flex" flexDirection="column" minHeight="100vh">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          p={2}
-        >
-          <Breadcrumbs>
-            <Typography color="text.primary">Purchase Order</Typography>
-          </Breadcrumbs>
-          <Box display="flex" gap={2}>
-            <Paper
-              elevation={0}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                px: 1.5,
-                py: 0.5,
-                borderRadius: "999px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                width: 240,
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 20, color: "#999" }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, fontSize: 14, flex: 1 }}
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Paper>
-            <IconButton
-              sx={{
-                borderRadius: "12px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                p: 1,
-              }}
-            >
-              <NotificationsNoneIcon sx={{ fontSize: 20, color: "#666" }} />
-            </IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Avatar src="https://i.pravatar.cc/40?img=1" />
-              <Typography fontSize={14}>Admin name</Typography>
-              <ArrowDropDownIcon />
-            </Box>
-          </Box>
-        </Box>
-        <Box p={3}>
+    <AppLayout title="Purchase Orders">
+        <Box>
           <Paper sx={{ p: 1, borderRadius: 2 }}>
             <Box
               display="flex"
@@ -554,8 +505,7 @@ const PurchaseOrderActions = () => {
             </Box>
           </Paper>
         </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

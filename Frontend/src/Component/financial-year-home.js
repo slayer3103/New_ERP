@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Box, Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import BASE_URL from '../config/api';
 
 const FinancialYearMain = () => {
@@ -51,10 +51,8 @@ const FinancialYearMain = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f4f5fa', minHeight: '100vh' }}>
-      <Sidebar />
-
-      <Box sx={{ flex: 1, p: 4 }}>
+    <AppLayout title="Financial Year">
+      <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
           <Typography variant="h5">📆 Financial Years</Typography>
           <Button variant="contained" color="primary" onClick={() => navigate('/add/financial_year')}>
@@ -105,7 +103,7 @@ const FinancialYearMain = () => {
           })
         )}
       </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

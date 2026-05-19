@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 
@@ -151,9 +151,8 @@ export default function EditWorkOrderPage() {
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+    <AppLayout title="Edit Work Order">
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Paper sx={{ width: 600, p: 4, borderRadius: 3 }}>
           <Typography variant="h5" fontWeight={600} mb={3} textAlign="center">
             Edit Work Order
@@ -276,6 +275,6 @@ export default function EditWorkOrderPage() {
           </form>
         </Paper>
       </Box>
-    </Box>
+    </AppLayout>
   );
 }

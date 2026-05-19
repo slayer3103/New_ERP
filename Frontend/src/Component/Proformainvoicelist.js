@@ -1,15 +1,11 @@
 import React from 'react';
 import {
-  Box, Typography, Button, InputBase, IconButton, Avatar, Chip,
+  Box, Typography, Button, IconButton, Chip,
   Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Menu, MenuItem,
   Paper
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 
 const rows = Array.from({ length: 15 }, (_, i) => ({
   invoiceNo: 'PINV-00001',
@@ -39,55 +35,8 @@ const ProformaInvoicelist = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', bgcolor: '#F9FAFB' }}>
-      <Sidebar />
-
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-
-        <Box
-          sx={{
-            height: 60,
-            borderBottom: '1px solid #eee',
-            display: 'flex',
-            alignItems: 'center',
-            px: 4,
-            justifyContent: 'space-between',
-            bgcolor: '#fff',
-          }}
-        >
-          <Typography fontWeight="bold">Proforma Invoice</Typography>
-
-          <Box display="flex" alignItems="center" gap={2}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#F0F0F0',
-                px: 2,
-                py: 0.5,
-                borderRadius: 5,
-                minWidth: 250,
-              }}
-            >
-              <SearchIcon fontSize="small" sx={{ color: '#555' }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, flex: 1, fontSize: 14 }}
-              />
-            </Box>
-
-            <IconButton>
-              <NotificationsNoneIcon />
-            </IconButton>
-
-            <Box display="flex" alignItems="center" gap={1}>
-              <NotificationsNoneIcon />
-              <UserMenu />
-            </Box>
-          </Box>
-        </Box>
-
-        <Box sx={{ p: 3, overflowY: 'auto', flexGrow: 1 }}>
+    <>
+    <AppLayout title="Pro Forma Invoices">
           <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
       
             <Box display="flex" justifyContent="space-between" mb={2}>
@@ -171,8 +120,7 @@ const ProformaInvoicelist = () => {
               />
             </Box>
           </Paper>
-        </Box>
-
+    </AppLayout>
 
         <Menu
           anchorEl={menuAnchor}
@@ -184,8 +132,7 @@ const ProformaInvoicelist = () => {
           <MenuItem onClick={handleClose}>Edit</MenuItem>
           <MenuItem onClick={handleClose}>Delete</MenuItem>
         </Menu>
-      </Box>
-    </Box>
+    </>
   );
 };
 

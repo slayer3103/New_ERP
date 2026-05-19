@@ -3,7 +3,7 @@ services:
   # MySQL Database
   mysql:
     image: mysql:8.0
-    container_name: erp_mysql3
+    container_name: erp_mysql4
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword123
@@ -29,7 +29,7 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    container_name: erp_backend3
+    container_name: erp_backend4
     restart: unless-stopped
     environment:
       DB_HOST: mysql
@@ -51,9 +51,9 @@ services:
   # Frontend Service
   frontend:
     build:
-      context: ./front
+      context: ./Frontend
       dockerfile: Dockerfile
-    container_name: erp_frontend3
+    container_name: erp_frontend4
     restart: unless-stopped
     ports:
       - "80:80"

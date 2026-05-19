@@ -32,7 +32,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import UserMenu from './UserMenu';
@@ -94,67 +94,7 @@ const navigate =useNavigate()
   const total = subtotal + gst * 2;
 
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flex: 1, p: 4 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 3,
-            mt: 1,
-          }}
-        >
-
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-            <Typography color="text.secondary" fontSize="14px">
-               Pro Forma Invoice
-            </Typography>
-            <Typography color="text.primary" fontWeight={600} fontSize="14px">
-              New Pro Forma Invoice
-            </Typography>
-          </Breadcrumbs>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 1.5,
-                py: 0.5,
-                borderRadius: '999px',
-                border: '1px solid #e0e0e0',
-                bgcolor: '#f9fafb',
-                width: 240,
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 20, color: '#999' }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, fontSize: 14, flex: 1 }}
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Paper>
-
-            <IconButton
-              sx={{
-                borderRadius: '12px',
-                border: '1px solid #e0e0e0',
-                bgcolor: '#f9fafb',
-                p: 1,
-              }}
-            >
-              <NotificationsNoneIcon sx={{ fontSize: 20, color: '#666' }} />
-            </IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-                        <Avatar src="https://i.pravatar.cc/150?img=1" />
-                        <Typography fontSize={14}>Admin name</Typography>
-                        <ArrowDropDownIcon />
-                      </Box>
-          </Box>
-        </Box>
+    <AppLayout title="Add Pro Forma Invoice">
         <Paper sx={{ p: 1, borderRadius: 2 }}>
 
 
@@ -667,8 +607,7 @@ const navigate =useNavigate()
 </Modal>
 
         </Paper>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

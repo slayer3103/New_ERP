@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, Table, TableHead, TableRow, TableCell,
-  TableBody, Checkbox, TextField, Chip, Pagination, Tabs, Tab,
-  IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent,
-  InputAdornment, Paper, Avatar, DialogActions, Modal
+  Box, Button, Typography, TextField, Pagination, Tabs, Tab,
+  IconButton, Menu, MenuItem, Paper, Modal,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import EmailIcon from '@mui/icons-material/Email';
 import LinkIcon from '@mui/icons-material/Link';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
-import { grey } from '@mui/material/colors';
-import UserMenu from './UserMenu';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import AppLayout from '../layouts/AppLayout';
+import PageHeader from '../components/common/PageHeader';
+import SearchField from '../components/common/SearchField';
+import DataTable from '../components/common/DataTable';
+import StatusChip from '../components/common/StatusChip';
+import LoadingState from '../components/common/LoadingState';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import BASE_URL from '../config/api';
 
 export default function VendorListPage() {
@@ -252,19 +251,40 @@ export default function VendorListPage() {
     return flatData;
   };
 
+  const vendorColumns = [
+    { id: 'vendor_name', label: 'Name', accessor: 'vendor_name' },
+    { id: 'company_name', label: 'Company Name', accessor: 'company_name' },
+    { id: 'display_name', label: 'Display Name', accessor: 'display_name' },
+    {
+      id: 'status',
+      label: 'Status',
+      render: (row) => <StatusChip status={row.status} />,
+    },
+    { id: 'email', label: 'Email Address', accessor: 'email' },
+    { id: 'phone', label: 'Phone', accessor: 'phone' },
+    {
+      id: 'actions',
+      label: 'Action',
+      align: 'center',
+      render: (row) => (
+        <IconButton size="small" onClick={(e) => handleMenuClick(e, row)}>
+          <MoreVertIcon />
+        </IconButton>
+      ),
+    },
+  ];
+
   if (loading) {
     return (
-      <Box sx={{ p: 4 }}>
-        <Typography>Loading vendors...</Typography>
-      </Box>
+      <AppLayout title="Vendors">
+        <LoadingState message="Loading vendors..." />
+      </AppLayout>
     );
   }
 
   return (
     <>
-      <Box sx={{ display: 'flex' }}>
-        <Sidebar />
-        <Box px={2} flex={1} display="flex" flexDirection="column" minHeight="100vh">
+      <AppLayout title="Vendors">
           {/* Edit Modal */}
           <Modal open={editModalOpen} onClose={handleEditClose}>
             <Box sx={{
@@ -519,154 +539,82 @@ export default function VendorListPage() {
             </Box>
           </Modal>
 
-          {/* Main Content */}
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            px: 4, py: 2,
-            bgcolor: 'white',
-          }}>
-            <Typography style={{ color: grey[500] }} fontWeight={600}>Vendors</Typography>
-            <Box display="flex" alignItems="center" gap={1}>
-              <NotificationsNoneIcon />
-              <UserMenu />
-            </Box>
-          </Box>
+        <Paper elevation={0} sx={{ p: { xs: 2, md: 3 } }}>
+          <PageHeader title="All Vendors" count={filteredVendors.length}>
+            <Button
+              variant="contained"
+              sx={{ textTransform: 'none' }}
+              onClick={() => navigate('/add-vendor')}
+            >
+              + New Vendor
+            </Button>
+          </PageHeader>
 
-          <Box sx={{ px: 2, py: 2 }}>
-            <Paper sx={{ p: 1, borderRadius: 2 }}>
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                px: 4, py: 2,
-                borderBottom: '1px solid #e0e0e0'
-              }}>
-                <Typography variant="h6" fontWeight={600}>Vendors</Typography>
-                <Button
-                  variant="contained"
-                  sx={{
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    bgcolor: '#004085',
-                    '&:hover': { bgcolor: '#003366' }
-                  }}
-                  onClick={() => navigate('/add-vendor')}
-                >
-                  + New Vendor
-                </Button>
-              </Box>
-
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                px: 4, py: 2
-              }}>
-                <Tabs
-                  value={tab}
-                  onChange={(_, val) => setTab(val)}
-                  textColor="primary"
-                  indicatorColor="primary"
-                >
-                  <Tab label="All Vendors" />
-                  <Tab label="Active Vendors" />
-                  <Tab label="Inactive Vendors" />
-                </Tabs>
-                <TextField
-                  size="small"
-                  placeholder="Search by vendor name..."
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    sx: { bgcolor: 'white', borderRadius: 2 }
-                  }}
-                />
-              </Box>
-
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell><Checkbox /></TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Company Name</TableCell>
-                    <TableCell>Display Name</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Email Address</TableCell>
-                    <TableCell>Phone</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredVendors.map(v => (
-                    <TableRow key={v.vendor_id}>
-                      <TableCell><Checkbox /></TableCell>
-                      <TableCell>{v.vendor_name}</TableCell>
-                      <TableCell>{v.company_name}</TableCell>
-                      <TableCell>{v.display_name}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={v.status}
-                          color={v.status === 'Active' ? 'success' : 'error'}
-                          variant="outlined"
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{v.email}</TableCell>
-                      <TableCell>{v.phone}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={(e) => handleMenuClick(e, v)}>
-                          <MoreVertIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              <Box mt={3} display="flex" justifyContent="space-between">
-                <Typography variant="body2">
-                  Showing {filteredVendors.length} of {vendorList.length} entries
-                </Typography>
-                <Pagination count={3} page={1} />
-              </Box>
-            </Paper>
-          </Box>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2,
+              mb: 2,
+            }}
           >
-            <MenuItem onClick={() => handleEditVendor(selectedVendor)}>
-              <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
-            </MenuItem>
-            
-            <MenuItem onClick={() => handleSendEmail(selectedVendor)}>
-              <EmailIcon fontSize="small" sx={{ mr: 1 }} /> Send Email
-            </MenuItem>
-            <MenuItem onClick={() => handleShareLink(selectedVendor)}>
-              <LinkIcon fontSize="small" sx={{ mr: 1 }} /> Share Link
-            </MenuItem>
-          </Menu>
+            <Tabs
+              value={tab}
+              onChange={(_, val) => setTab(val)}
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab label="All Vendors" />
+              <Tab label="Active Vendors" />
+              <Tab label="Inactive Vendors" />
+            </Tabs>
+            <SearchField
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Search by vendor name..."
+              debounceMs={200}
+            />
+          </Box>
 
-          <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-            <DialogTitle>Delete Vendor</DialogTitle>
-            <DialogContent>
-              Are you sure you want to delete "{selectedVendor?.display_name}"?
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-              <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
-            </DialogActions>
-          </Dialog>
-        </Box>
-      </Box>
+          <DataTable
+            columns={vendorColumns}
+            rows={filteredVendors}
+            rowKey="vendor_id"
+            getRowId={(row) => row.vendor_id}
+            emptyMessage="No vendors found"
+          />
+
+          <Box mt={3} display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="body2" color="text.secondary">
+              Showing {filteredVendors.length} of {vendorList.length} entries
+            </Typography>
+            <Pagination count={3} page={1} />
+          </Box>
+        </Paper>
+
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+          <MenuItem onClick={() => handleEditVendor(selectedVendor)}>
+            <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+          </MenuItem>
+          <MenuItem onClick={() => handleSendEmail(selectedVendor)}>
+            <EmailIcon fontSize="small" sx={{ mr: 1 }} /> Send Email
+          </MenuItem>
+          <MenuItem onClick={() => handleShareLink(selectedVendor)}>
+            <LinkIcon fontSize="small" sx={{ mr: 1 }} /> Share Link
+          </MenuItem>
+        </Menu>
+
+        <ConfirmDialog
+          open={openDialog}
+          title="Delete Vendor"
+          message={`Are you sure you want to delete "${selectedVendor?.display_name}"?`}
+          confirmLabel="Delete"
+          onConfirm={confirmDelete}
+          onCancel={() => setOpenDialog(false)}
+        />
+      </AppLayout>
     </>
   );
 }

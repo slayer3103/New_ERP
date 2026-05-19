@@ -5,9 +5,8 @@ import {
   Paper,
   Card,
   CardContent,
-  InputBase,
-  IconButton,
   Avatar,
+  InputBase,
   CircularProgress,
   Alert,
   Table,
@@ -20,14 +19,11 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 import {
@@ -119,29 +115,7 @@ const POSummaries = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <Box sx={{ backgroundColor: '#fff', p: 2, px: 3, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <ListAltIcon sx={{ color: '#3b82f6' }} />
-            <Typography variant="h5" fontWeight="bold" color="#1e293b">PO Summaries</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f1f5f9', px: 2, py: 0.5, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-              <SearchIcon fontSize="small" sx={{ mr: 1, color: '#64748b' }} />
-              <InputBase placeholder="Search analytics..." sx={{ fontSize: '14px' }} />
-            </Box>
-            <IconButton sx={{ color: '#64748b' }}><NotificationsNoneIcon /></IconButton>
-            <UserMenu />
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-            <Typography fontSize={14} color="#64748b">Admin</Typography>
-          </Box>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+    <AppLayout title="PO Summaries">
           <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>📋 Purchase Order Summaries</Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>Overview of all purchase orders with total spending and item details</Typography>
@@ -271,9 +245,7 @@ const POSummaries = () => {
               </TableContainer>
             </>
           ) : null}
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

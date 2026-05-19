@@ -4,8 +4,6 @@ import {
   Typography,
   Button,
   IconButton,
-  Avatar,
-  InputBase,
   Paper,
   Grid,
   Chip,
@@ -20,14 +18,14 @@ import {
   Alert,
   Menu,
   MenuItem,
+  InputBase,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import axios from 'axios';
 
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import BASE_URL from '../config/api';
 
 const PaymentsSettings = () => {
@@ -126,31 +124,7 @@ const PaymentsSettings = () => {
   });
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f4f5fa', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        {/* Header */}
-        <Box sx={{ 
-          backgroundColor: '#fff', 
-          p: 2, 
-          borderRadius: '12px',
-          mb: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Typography variant="h5" fontWeight="600">
-            Payments Settings
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton>
-              <NotificationsNoneIcon />
-            </IconButton>
-            <Avatar sx={{ width: 35, height: 35 }} />
-          </Box>
-        </Box>
-
-        {/* Main Content */}
+    <AppLayout title="Payment Settings">
         <Paper sx={{ p: 3, borderRadius: '12px' }}>
           {/* Error Alert */}
           {error && (
@@ -361,8 +335,7 @@ const PaymentsSettings = () => {
             />
           </Box>
         </Paper>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

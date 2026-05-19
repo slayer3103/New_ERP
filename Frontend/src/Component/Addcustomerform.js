@@ -4,7 +4,7 @@ import {
   Select, MenuItem, FormControl, InputLabel, Paper, Divider
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 
@@ -146,10 +146,8 @@ const AddCustomerForm = () => {
     ));
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, p: 4 }}>
-        <Paper elevation={3} sx={{ p: 4, maxWidth: 1100, mx: 'auto' }}>
+    <AppLayout title="Add Customer">
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, maxWidth: 1100, mx: 'auto' }}>
           <Typography variant="h4" gutterBottom fontWeight={600}>
             Add Customer
           </Typography>
@@ -236,9 +234,8 @@ const AddCustomerForm = () => {
             </Grid>
 
           </form>
-        </Paper>
-      </Box>
-    </Box>
+      </Paper>
+    </AppLayout>
   );
 };
 

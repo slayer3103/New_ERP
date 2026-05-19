@@ -5,9 +5,8 @@ import {
   Paper,
   Card,
   CardContent,
-  InputBase,
-  IconButton,
   Avatar,
+  InputBase,
   CircularProgress,
   Alert,
   Table,
@@ -20,14 +19,11 @@ import {
   Divider,
   LinearProgress,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 
@@ -91,29 +87,7 @@ const VendorSpendAnalysis = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <Box sx={{ backgroundColor: '#fff', p: 2, px: 3, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <StorefrontIcon sx={{ color: '#7c3aed' }} />
-            <Typography variant="h5" fontWeight="bold" color="#1e293b">Vendor Spend Analysis</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f1f5f9', px: 2, py: 0.5, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-              <SearchIcon fontSize="small" sx={{ mr: 1, color: '#64748b' }} />
-              <InputBase placeholder="Search analytics..." sx={{ fontSize: '14px' }} />
-            </Box>
-            <IconButton sx={{ color: '#64748b' }}><NotificationsNoneIcon /></IconButton>
-            <UserMenu />
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-            <Typography fontSize={14} color="#64748b">Admin</Typography>
-          </Box>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+    <AppLayout title="Vendor Spend Analysis">
           <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>🏢 Vendor Spend Analysis</Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>Analyze procurement spending across vendors</Typography>
@@ -213,9 +187,7 @@ const VendorSpendAnalysis = () => {
               </TableContainer>
             </>
           ) : null}
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

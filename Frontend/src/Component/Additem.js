@@ -21,11 +21,10 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import UserMenu from './UserMenu';
 import BASE_URL from '../config/api';
 
 export default function AddItems() {
@@ -194,70 +193,9 @@ export default function AddItems() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar active="Items" />
-      <Box sx={{ flex: 1, bgcolor: "#f9fafc", minHeight: "100vh" }}>
-        {/* Header */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-            mt: 1,
-            px: 3,
-          }}
-        >
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize="small" />}
-            aria-label="breadcrumb"
-          >
-            <Typography color="text.secondary" fontSize="14px">
-              Product & Services
-            </Typography>
-            <Typography color="text.primary" fontWeight={600} fontSize="14px">
-              Add
-            </Typography>
-          </Breadcrumbs>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                px: 1.5,
-                py: 0.5,
-                borderRadius: "999px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                width: 240,
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 20, color: "#999" }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, fontSize: 14, flex: 1 }}
-              />
-            </Paper>
-            <IconButton
-              sx={{
-                borderRadius: "12px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                p: 1,
-              }}
-            >
-              <NotificationsNoneIcon sx={{ fontSize: 20, color: "#666" }} />
-            </IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-              <NotificationsNoneIcon />
-              <UserMenu />
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Form */}
-        <Box sx={{ px: 4, py: 4 }}>
+    <>
+    <AppLayout title="Add Product">
+        <Box>
           <Paper sx={{ p: 3, borderRadius: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
               New Product & Services
@@ -585,7 +523,7 @@ export default function AddItems() {
             </Button>
           </DialogActions>
         </Dialog>
-      </Box>
-    </Box>
+    </AppLayout>
+    </>
   );
 }

@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Typography, Button, TextField, Tabs, Tab, Table, TableHead, TableRow, TableCell, TableBody,
-  IconButton, Menu, MenuItem, Chip, Checkbox, InputAdornment, Paper, Pagination, InputBase, Avatar
+  IconButton, Menu, MenuItem, Chip, Checkbox, InputAdornment, Paper, Pagination
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import SearchIcon from '@mui/icons-material/Search';
-import Sidebar from './Sidebar';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import AppLayout from '../layouts/AppLayout';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -101,12 +100,9 @@ export default function ItemList() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar active="Items" />
-      <Box sx={{ flex: 1, bgcolor: '#f9fafc', minHeight: '100vh' }}>
-        {/* ... HEADER UI same as before ... */}
-
-        <Box sx={{ px: 2, py: 2 }}>
+    <>
+    <AppLayout title="Products & Services">
+        <Box>
           <Paper sx={{ p: 1, borderRadius: 2 }}>
             <Box sx={{
               display: 'flex',
@@ -244,7 +240,7 @@ export default function ItemList() {
             </Box>
           </Paper>
         </Box>
-      </Box>
+    </AppLayout>
 
       <EditProductDialog
   open={editDialogOpen}
@@ -252,9 +248,6 @@ export default function ItemList() {
   product={productToEdit}
   onSave={handleEditSave}
 />
-
-
-    </Box>
-    
+    </>
   );
 }

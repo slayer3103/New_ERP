@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Paper, Typography, MenuItem, FormControl, InputLabel, Select, Alert, CircularProgress } from '@mui/material';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 
@@ -139,19 +138,8 @@ export default function EditPurchaseOrderPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-            Edit Purchase Order
-          </Typography>
-          <UserMenu />
-        </Box>
-        
-        {/* Main Content */}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 5, width: '100%' }}>
+    <AppLayout title="Edit Purchase Order">
+        <Box sx={{ display: "flex", justifyContent: "center", width: '100%' }}>
           <Paper sx={{ width: 600, p: 4, borderRadius: 3 }}>
             <Typography variant="h5" fontWeight={600} mb={3} textAlign="center">
               Purchase Order Details
@@ -303,7 +291,6 @@ export default function EditPurchaseOrderPage() {
           </form>
         </Paper>
       </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 }

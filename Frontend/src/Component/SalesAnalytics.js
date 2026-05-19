@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Paper, Grid, Button, Card, CardContent,
-  InputBase, IconButton, Avatar, Chip, CircularProgress, Alert,
+  Avatar, Chip, CircularProgress, Alert,
   Divider, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, LinearProgress,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import ReceiptIcon from '@mui/icons-material/Receipt';
@@ -16,8 +14,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import PeopleIcon from '@mui/icons-material/People';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 import {
@@ -112,29 +109,7 @@ const SalesAnalytics = () => {
   })) || [];
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <Box sx={{ backgroundColor: '#fff', p: 2, px: 3, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <CalendarTodayIcon sx={{ color: '#3b82f6' }} />
-            <Typography variant="h5" fontWeight="bold" color="#1e293b">Sales Analytics</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f1f5f9', px: 2, py: 0.5, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-              <SearchIcon fontSize="small" sx={{ mr: 1, color: '#64748b' }} />
-              <InputBase placeholder="Search analytics..." sx={{ fontSize: '14px' }} />
-            </Box>
-            <IconButton sx={{ color: '#64748b' }}><NotificationsNoneIcon /></IconButton>
-            <UserMenu />
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-            <Typography fontSize={14} color="#64748b">Admin</Typography>
-          </Box>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+    <AppLayout title="Sales Analytics">
           {/* Period Filter */}
           <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>📊 Sales Performance Dashboard</Typography>
@@ -378,9 +353,7 @@ const SalesAnalytics = () => {
               <Typography variant="body2" color="text.secondary">No sales data found for the selected period.</Typography>
             </Paper>
           )}
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

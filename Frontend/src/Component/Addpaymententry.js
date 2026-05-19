@@ -16,7 +16,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import { useNavigate } from 'react-router-dom';
 import BASE_URL from '../config/api';
 
@@ -182,50 +182,8 @@ const AddPaymentsEntry = () => {
     }
   };
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f4f5fa', minHeight: '100vh' }}>
-  
-      <Sidebar />
-
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-      
-        <Box
-          sx={{
-            backgroundColor: '#fff',
-            p: 2,
-            px: 3,
-            borderBottom: '1px solid #e0e0e0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold">
-            Payments Settings
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#f0f0f0',
-                px: 2,
-                py: 0.5,
-                borderRadius: '8px',
-              }}
-            >
-              <SearchIcon fontSize="small" sx={{ mr: 1 }} />
-              <InputBase placeholder="Search anything here..." />
-            </Box>
-            <IconButton>
-              <NotificationsNoneIcon />
-            </IconButton>
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-            <Typography fontSize={14}>Admin name</Typography>
-          </Box>
-        </Box>
-
-       
-        <Box sx={{ p: 3 }}>
+    <AppLayout title="Add Payment Entry">
+        <Box>
           {/* Error and Success Messages */}
           {error && (
             <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -495,8 +453,7 @@ const AddPaymentsEntry = () => {
             </form>
           </Paper>
         </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

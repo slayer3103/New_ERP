@@ -8,18 +8,12 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Avatar,
-  InputBase,
   Paper,
 } from '@mui/material';
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import UserMenu from './UserMenu';
-
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 
 const statusOptions = ['Active', 'Inactive'];
 
@@ -34,49 +28,7 @@ const FinancialYearSettings = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f4f5fa', minHeight: '100vh' }}>
-      <Sidebar />
-
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-      
-        <Box
-          sx={{
-            backgroundColor: '#fff',
-            p: 2,
-            px: 3,
-            borderBottom: '1px solid #e0e0e0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold">
-            Financial Year Settings
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#f0f0f0',
-                px: 2,
-                py: 0.5,
-                borderRadius: '8px',
-              }}
-            >
-              <SearchIcon fontSize="small" sx={{ mr: 1 }} />
-              <InputBase placeholder="Search anything here..." />
-            </Box>
-            <IconButton>
-              <NotificationsNoneIcon />
-            </IconButton>
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-            <Typography fontSize={14}>Admin name</Typography>
-          </Box>
-        </Box>
-
-        <Box sx={{ p: 3 }}>
+    <AppLayout title="Financial Year Settings">
           <Paper elevation={0} sx={{ p: 4, borderRadius: '12px' }}>
             <Box display="flex" alignItems="center" gap={1} mb={3}>
               {isEditMode && <ArrowBackIosNewIcon fontSize="small" />}
@@ -218,9 +170,7 @@ const FinancialYearSettings = () => {
               )}
             </Box>
           </Paper>
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

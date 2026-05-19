@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Box, Typography, Button, TextField, InputAdornment, IconButton,
+    Box, Typography, Button, TextField, IconButton,
     Paper, Table, TableBody, TableCell, TableHead, TableRow, Menu, MenuItem,
-    Checkbox, Modal, InputBase, Avatar
+    Modal,
 } from '@mui/material';
 import {
     MoreVert as MoreVertIcon,
-    Search as SearchIcon,
     Edit as EditIcon,
     Print as PrintIcon,
-    Delete as DeleteIcon,
     Block as BlockIcon,
-    NotificationsNone as NotificationsNoneIcon,
-    Close as CloseIcon
 } from '@mui/icons-material';
-import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
+import PageHeader from '../components/common/PageHeader';
+import SearchField from '../components/common/SearchField';
+import DataTable from '../components/common/DataTable';
+import StatusChip from '../components/common/StatusChip';
+import LoadingState from '../components/common/LoadingState';
+import { tokens } from '../theme/paletteTokens';
 import BASE_URL from '../config/api';
 
 export default function CustomerList() {
@@ -191,18 +191,93 @@ export default function CustomerList() {
         return matchSearch && matchType;
     });
 
+    const customerColumns = [
+        {
+            id: 'status',
+            label: 'Status',
+            render: (row) => <StatusChip status={row.status || 'Inactive'} />,
+        },
+        {
+            id: 'company_name',
+            label: 'Company Name',
+            render: (row) => (
+                <Typography variant="body2" fontWeight={500}>
+                    {formatName(row.company_name) || '—'}
+                </Typography>
+            ),
+        },
+        {
+            id: 'customer_name',
+            label: 'Customer Name',
+            render: (row) => formatName(row.customer_name),
+        },
+        {
+            id: 'customer_type',
+            label: 'Type',
+            render: (row) => (
+                <Typography variant="caption" sx={{ fontWeight: 600, color: tokens.primary }}>
+                    {row.customer_type || '—'}
+                </Typography>
+            ),
+        },
+        { id: 'email', label: 'Email', accessor: 'email' },
+        {
+            id: 'mobile',
+            label: 'Mobile',
+            render: (row) => (
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 13 }}>
+                    {formatMobile(row.mobile)}
+                </Typography>
+            ),
+        },
+        {
+            id: 'gst',
+            label: 'GST No.',
+            render: (row) => row.gst || '—',
+        },
+        {
+            id: 'actions',
+            label: 'Action',
+            align: 'center',
+            render: (row) => (
+                <>
+                    <IconButton size="small" onClick={(e) => handleMenuOpen(e, row.id)}>
+                        <MoreVertIcon />
+                    </IconButton>
+                    {selectedRow === row.id && (
+                        <Menu
+                            anchorEl={menuAnchor}
+                            open={Boolean(menuAnchor)}
+                            onClose={handleMenuClose}
+                            PaperProps={{ sx: { width: 200 } }}
+                        >
+                            <MenuItem onClick={() => { handleEditClick(row); handleMenuClose(); }}>
+                                <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+                            </MenuItem>
+                            <MenuItem onClick={() => handlePrintStatement(row)}>
+                                <PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print Statement
+                            </MenuItem>
+                            <MenuItem onClick={() => toggleCustomerStatus(row)}>
+                                <BlockIcon fontSize="small" sx={{ mr: 1 }} />
+                                {row.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}
+                            </MenuItem>
+                        </Menu>
+                    )}
+                </>
+            ),
+        },
+    ];
+
     if (loading) {
         return (
-            <Box sx={{ p: 4 }}>
-                <Typography>Loading customers...</Typography>
-            </Box>
+            <AppLayout title="Customers">
+                <LoadingState message="Loading customers..." />
+            </AppLayout>
         );
     }
 
-
     return (
-        <Box sx={{ display: 'flex' }}>
-            <Sidebar />
+        <>
 
             {/* Print Statement Dialog */}
             <Dialog open={printDialogOpen} onClose={() => setPrintDialogOpen(false)} maxWidth="md" fullWidth>
@@ -406,177 +481,47 @@ export default function CustomerList() {
                 </Box>
             </Modal>
 
-            {/* Main Content */}
-            <Box sx={{ flex: 1, minHeight: '100vh', bgcolor: '#f9fafc' }}>
-                {/* Top bar */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, mt: 1, px: 3 }}>
-                    <Typography color="text.secondary" fontSize="20px">Customer</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: '999px',
-                                border: '1px solid #e0e0e0',
-                                width: 240,
-                            }}
+            <AppLayout title="Customers">
+                <Paper elevation={0} sx={{ p: { xs: 2, md: 3 } }}>
+                    <PageHeader title="All Customers" count={filteredCustomers.length}>
+                        <TextField
+                            select
+                            size="small"
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            sx={{ minWidth: 140 }}
                         >
-                            <SearchIcon sx={{ fontSize: 20, color: '#999' }} />
-                            <InputBase placeholder="Search anything here..." sx={{ ml: 1, fontSize: 14, flex: 1 }} />
-                        </Paper>
-                        <IconButton sx={{ borderRadius: '12px', border: '1px solid #e0e0e0', bgcolor: '#f9fafb', p: 1 }}>
-                            <NotificationsNoneIcon sx={{ fontSize: 20, color: '#666' }} />
-                        </IconButton>
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <Avatar src="https://i.pravatar.cc/40?img=1" />
-                            <UserMenu />
-                        </Box>
-                    </Box>
-                </Box>
-
-                {/* Table */}
-                <Box sx={{ px: 2, py: 2 }}>
-                    <Paper sx={{ p: 1, borderRadius: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 4, py: 2, borderBottom: '1px solid #e0e0e0' }}>
-                            <Box display="flex" alignItems="center" gap={2}>
-                                <Typography variant="h6" sx={{ fontWeight: 600 }}>Customer</Typography>
-                                <Box sx={{ bgcolor: '#e8f0fe', color: '#1a56db', px: 1.5, py: 0.3, borderRadius: '999px', fontSize: 13, fontWeight: 600 }}>
-                                    {filteredCustomers.length}
-                                </Box>
-                            </Box>
-                            <Box display="flex" alignItems="center" gap={2}>
-                                {/* Filter by type */}
-                                <TextField
-                                    select
-                                    size="small"
-                                    value={filterType}
-                                    onChange={(e) => setFilterType(e.target.value)}
-                                    sx={{ minWidth: 140 }}
-                                >
-                                    <MenuItem value="All">All Types</MenuItem>
-                                    <MenuItem value="Domestic">Domestic</MenuItem>
-                                    <MenuItem value="International">International</MenuItem>
-                                </TextField>
-                                {/* Search */}
-                                <Paper elevation={0} sx={{ display: 'flex', alignItems: 'center', px: 1.5, py: 0.5, borderRadius: '999px', border: '1px solid #e0e0e0', width: 220 }}>
-                                    <SearchIcon sx={{ fontSize: 18, color: '#999' }} />
-                                    <InputBase
-                                        placeholder="Search customers..."
-                                        sx={{ ml: 1, fontSize: 13, flex: 1 }}
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                    {searchTerm && (
-                                        <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                            <CloseIcon sx={{ fontSize: 16 }} />
-                                        </IconButton>
-                                    )}
-                                </Paper>
-                                <Button
-                                    variant="contained"
-                                    sx={{ textTransform: 'none', borderRadius: 2, bgcolor: '#004085', '&:hover': { bgcolor: '#003366' } }}
-                                    onClick={() => navigate('/add-customer')}
-                                >
-                                    + New Customer
-                                </Button>
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ px: 4, pt: 2 }}>
-                            <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden', backgroundColor: '#fff' }}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow sx={{ bgcolor: '#f5f6fa' }}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
-                                                    indeterminate={selectedCustomers.length > 0 && selectedCustomers.length < filteredCustomers.length}
-                                                    onChange={handleSelectAll}
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Company Name</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Customer Name</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>Mobile</TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>GST No.</TableCell>
-                                            <TableCell align="center" sx={{ fontWeight: 600 }}>Action</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {filteredCustomers.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell colSpan={9} align="center" sx={{ py: 6, color: '#999' }}>
-                                                    No customers found
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                        filteredCustomers.map((row) => (
-                                            <TableRow key={row.id} hover sx={{ '&:hover': { bgcolor: '#f9fafb' } }}>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        checked={selectedCustomers.includes(row.id)}
-                                                        onChange={() => handleSelectOne(row.id)}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Box sx={{
-                                                        display: 'inline-block', px: 1.5, py: 0.4,
-                                                        borderRadius: '999px', fontSize: '12px', fontWeight: 600,
-                                                        bgcolor: row.status === 'Active' ? '#d1fae5' : '#fee2e2',
-                                                        color: row.status === 'Active' ? '#065f46' : '#991b1b',
-                                                    }}>
-                                                        {row.status || 'Inactive'}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell sx={{ fontWeight: 500 }}>{formatName(row.company_name) || '—'}</TableCell>
-                                                <TableCell>{formatName(row.customer_name)}</TableCell>
-                                                <TableCell>
-                                                    <Box sx={{
-                                                        display: 'inline-block', px: 1.2, py: 0.3,
-                                                        borderRadius: '6px', fontSize: '12px',
-                                                        bgcolor: row.customer_type === 'Domestic' ? '#eff6ff' : '#fdf4ff',
-                                                        color: row.customer_type === 'Domestic' ? '#1d4ed8' : '#7e22ce',
-                                                        fontWeight: 500
-                                                    }}>
-                                                        {row.customer_type || '—'}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell sx={{ color: '#374151', fontSize: 13 }}>{row.email || '—'}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'monospace', fontSize: 13 }}>{formatMobile(row.mobile)}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'monospace', fontSize: 12, color: '#6b7280' }}>{row.gst || '—'}</TableCell>
-                                                <TableCell align="center">
-                                                    <IconButton onClick={(e) => handleMenuOpen(e, row.id)}><MoreVertIcon /></IconButton>
-                                                    {selectedRow === row.id && (
-                                                        <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose} PaperProps={{ sx: { width: 200 } }}>
-                                                            <MenuItem onClick={() => { handleEditClick(row); handleMenuClose(); }}>
-                                                                <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
-                                                            </MenuItem>
-                                                            <MenuItem onClick={() => handlePrintStatement(row)}>
-                                                                <PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print Statement
-                                                            </MenuItem>
-                                                            <MenuItem onClick={() => toggleCustomerStatus(row)}>
-                                                                <BlockIcon fontSize="small" sx={{ mr: 1 }} />
-                                                                {row.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}
-                                                            </MenuItem>
-                                                        </Menu>
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </Paper>
-                        </Box>
-                    </Paper>
-                </Box>
-            </Box>
-        </Box>
+                            <MenuItem value="All">All Types</MenuItem>
+                            <MenuItem value="Domestic">Domestic</MenuItem>
+                            <MenuItem value="International">International</MenuItem>
+                        </TextField>
+                        <SearchField
+                            value={searchTerm}
+                            onChange={setSearchTerm}
+                            placeholder="Search customers..."
+                            debounceMs={200}
+                        />
+                        <Button
+                            variant="contained"
+                            sx={{ textTransform: 'none' }}
+                            onClick={() => navigate('/add-customer')}
+                        >
+                            + New Customer
+                        </Button>
+                    </PageHeader>
+                    <DataTable
+                        columns={customerColumns}
+                        rows={filteredCustomers}
+                        rowKey="id"
+                        emptyMessage="No customers found"
+                        selectable
+                        selectedIds={selectedCustomers}
+                        onSelectAll={handleSelectAll}
+                        onSelectOne={handleSelectOne}
+                    />
+                </Paper>
+            </AppLayout>
+        </>
     );
 }
 

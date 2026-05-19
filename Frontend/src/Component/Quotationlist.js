@@ -23,7 +23,7 @@ import {
   InputBase,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import AddIcon from "@mui/icons-material/Add";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +32,6 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
-import UserMenu from "./UserMenu";
 import ui from '../assets/mera.png';
 import BASE_URL from '../config/api';
 
@@ -620,62 +619,8 @@ export default function QuotationListPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-
-      <Box sx={{ flex: 1, bgcolor: "#f9fafc", minHeight: "100vh" }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-            mt: 1,
-            px: 3,
-          }}
-        >
-          <Typography color="text.secondary" fontSize="20px">
-            Quatation
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                px: 1.5,
-                py: 0.5,
-                borderRadius: "999px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                width: 240,
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 20, color: "#999" }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, fontSize: 14, flex: 1 }}
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Paper>
-
-            <IconButton
-              sx={{
-                borderRadius: "12px",
-                border: "1px solid #e0e0e0",
-                bgcolor: "#f9fafb",
-                p: 1,
-              }}
-            >
-              <NotificationsNoneIcon sx={{ fontSize: 20, color: "#666" }} />
-            </IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-              <UserMenu />
-            </Box>
-          </Box>
-        </Box>
-        <Box sx={{ px: 2, py: 2 }}>
+    <AppLayout title="Quotations">
+        <Box>
           <Paper sx={{ p: 1, borderRadius: 2 }}>
             <Box
               sx={{
@@ -914,7 +859,6 @@ export default function QuotationListPage() {
             </Box>
           </Paper>
         </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 }

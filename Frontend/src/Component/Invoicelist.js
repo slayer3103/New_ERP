@@ -26,20 +26,19 @@ import PrintIcon from "@mui/icons-material/Print";
 import EditIcon from "@mui/icons-material/Edit";
 import ShareIcon from "@mui/icons-material/Share";
 import EmailIcon from "@mui/icons-material/Email";
-import Sidebar from "./Sidebar";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import { useNavigate } from "react-router-dom";
+import AppLayout from "../layouts/AppLayout";
+import PageHeader from "../components/common/PageHeader";
+import SearchField from "../components/common/SearchField";
+import DataTable from "../components/common/DataTable";
+import StatusChip from "../components/common/StatusChip";
+import LoadingState from "../components/common/LoadingState";
+import ErrorState from "../components/common/ErrorState";
+import { tokens } from "../theme/paletteTokens";
 import axios from 'axios';
 import ui from "../assets/mera.png"
 import ne from "../assets/new.png"
 import BASE_URL from '../config/api';
-const statusColor = {
-  Paid: "success",
-  Draft: "default",
-  Partial: "info",
-};
-
 export default function Invoicelist() {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -59,9 +58,9 @@ export default function Invoicelist() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleMenuOpen = (event, index) => {
+  const handleMenuOpen = (event, invoiceId) => {
     setAnchorEl(event.currentTarget);
-    setMenuIndex(index);
+    setMenuIndex(invoiceId);
   };
 
   const handleMenuClose = () => {
@@ -1704,162 +1703,185 @@ export default function Invoicelist() {
     invoice.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box sx={{ flex: 1, bgcolor: "#f9fafc", minHeight: "100vh" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, mt: 1, px: 3 }}>
-          <Typography color="text.secondary" fontSize="20px">Invoice</Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Paper elevation={0} sx={{
-              display: "flex", alignItems: "center", px: 1.5, py: 0.5, borderRadius: "999px",
-              border: "1px solid #e0e0e0", bgcolor: "#f9fafb", width: 240,
-            }}>
-              <SearchIcon sx={{ fontSize: 20, color: "#999" }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, fontSize: 14, flex: 1 }}
-                inputProps={{ "aria-label": "search" }}
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </Paper>
-            <IconButton sx={{
-              borderRadius: "12px", border: "1px solid #e0e0e0", bgcolor: "#f9fafb", p: 1,
-            }}>
-              <NotificationsNoneIcon sx={{ fontSize: 20, color: "#666" }} />
-            </IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Avatar src="https://i.pravatar.cc/150?img=1" />
-              <Typography fontSize={14}>Admin name</Typography>
-              <ArrowDropDownIcon />
-            </Box>
-          </Box>
-        </Box>
-
-        <Box sx={{ px: 2, py: 2 }}>
-          <Paper sx={{ p: 1, borderRadius: 2 }}>
-            <Box sx={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              px: 4, py: 2, borderBottom: "1px solid #e0e0e0",
-            }}>
-              <Typography variant="h6" fontWeight={600}>Invoice</Typography>
-              <Button variant="contained" sx={{
-                backgroundColor: "#004085", color: "#fff", fontWeight: 600,
-                textTransform: "none", borderRadius: "10px", px: 2.5,
-                "&:hover": { backgroundColor: "#003366" },
-              }} onClick={handleNewInvoice}>+ New Invoice</Button>
-            </Box>
-
-            <Box sx={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              px: 3, py: 1.5, borderBottom: "1px solid #e0e0e0", borderRadius: 1, mb: 2,
-            }}>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {["All Invoices", "Sent Invoices", "Draft Invoices", "Pro Forma Invoices"].map((label, i) => (
-                  <Button
-                    key={i}
-                    onClick={() => setSelectedFilter(label)}
-                    variant={selectedFilter === label ? "contained" : "outlined"}
-                    sx={{
-                      backgroundColor: selectedFilter === label ? "#004085" : "transparent",
-                      borderColor: "#cfd8dc", color: selectedFilter === label ? "#fff" : "#333",
-                      fontWeight: 500, textTransform: "none", borderRadius: "20px", px: 2, height: 36,
-                      "&:hover": { backgroundColor: selectedFilter === label ? "#003366" : "#f5f5f5" },
-                    }}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </Box>
-
-              <TextField
-                size="small"
-                placeholder="Search by invoice no, customer name..."
-                InputProps={{
-                  endAdornment: <InputAdornment position="end"><SearchIcon /></InputAdornment>,
-                  sx: { bgcolor: "#f9f9f9", borderRadius: "20px", px: 1 },
+  const invoiceColumns = [
+    {
+      id: 'invoice_number',
+      label: 'Invoice#',
+      render: (row) => (
+        <Typography variant="body2" sx={{ color: tokens.primary, fontWeight: 600 }}>
+          {row.invoice_number}
+        </Typography>
+      ),
+    },
+    { id: 'customer_name', label: 'Customer Name', accessor: 'customer_name' },
+    { id: 'invoice_date', label: 'Created Date', accessor: 'invoice_date' },
+    { id: 'expiry_date', label: 'Due Date', accessor: 'expiry_date' },
+    {
+      id: 'status',
+      label: 'Status',
+      render: (row) => <StatusChip status={row.status} />,
+    },
+    {
+      id: 'grand_total',
+      label: 'Bill Amount',
+      render: (row) => (row.grand_total ? `₹${row.grand_total}` : '—'),
+    },
+    {
+      id: 'actions',
+      label: 'Action',
+      align: 'center',
+      render: (row) => (
+        <>
+          <IconButton size="small" onClick={(e) => handleMenuOpen(e, row.invoice_id)}>
+            <MoreVertIcon />
+          </IconButton>
+          {menuIndex === row.invoice_id && (
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              PaperProps={{ sx: { width: 200 } }}
+            >
+              <MenuItem onClick={() => handleEditInvoice(row.invoice_id)}>
+                <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+              </MenuItem>
+              <MenuItem onClick={() => handleDownloadPdf(row)}>
+                <PictureAsPdfIcon fontSize="small" sx={{ mr: 1 }} /> Download the PDF
+              </MenuItem>
+              <MenuItem onClick={() => handleDownloadPdf(row)}>
+                <PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print Invoice
+              </MenuItem>
+              <MenuItem onClick={() => handleSendEmail(row)}>
+                <EmailIcon fontSize="small" sx={{ mr: 1 }} /> Send Email
+              </MenuItem>
+              <MenuItem onClick={() => handleShareLink(row)}>
+                <ShareIcon fontSize="small" sx={{ mr: 1 }} /> Share Link
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  try {
+                    await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Paid' });
+                    setInvoices((prev) =>
+                      prev.map((inv) =>
+                        inv.invoice_id === row.invoice_id ? { ...inv, status: 'Paid' } : inv
+                      )
+                    );
+                    handleMenuClose();
+                  } catch (err) {
+                    console.error('Error updating status:', err);
+                    alert('Failed to update invoice status');
+                  }
                 }}
-                sx={{ width: 300 }}
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </Box>
+              >
+                Mark as Paid
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  try {
+                    await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Partial' });
+                    setInvoices((prev) =>
+                      prev.map((inv) =>
+                        inv.invoice_id === row.invoice_id ? { ...inv, status: 'Partial' } : inv
+                      )
+                    );
+                    handleMenuClose();
+                  } catch (err) {
+                    console.error('Error updating status:', err);
+                    alert('Failed to update invoice status');
+                  }
+                }}
+              >
+                Mark as Partial
+              </MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  try {
+                    await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Draft' });
+                    setInvoices((prev) =>
+                      prev.map((inv) =>
+                        inv.invoice_id === row.invoice_id ? { ...inv, status: 'Draft' } : inv
+                      )
+                    );
+                    handleMenuClose();
+                  } catch (err) {
+                    console.error('Error updating status:', err);
+                    alert('Failed to update invoice status');
+                  }
+                }}
+              >
+                Mark as Draft
+              </MenuItem>
+            </Menu>
+          )}
+        </>
+      ),
+    },
+  ];
 
-            <Paper sx={{ overflow: "auto" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox"><Checkbox /></TableCell>
-                    <TableCell>Invoice#</TableCell>
-                    <TableCell>Customer Name</TableCell>
-                    <TableCell>Created Date</TableCell>
-                    <TableCell>Due Date</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Bill Amount</TableCell>
-                    <TableCell align="center">Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredInvoices.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell padding="checkbox"><Checkbox /></TableCell>
-                      <TableCell sx={{ color: "#0061F2", fontWeight: 500 }}>{row.invoice_number}</TableCell>
-                      <TableCell>{row.customer_name}</TableCell>
-                      <TableCell>{row.invoice_date}</TableCell>
-                      <TableCell>{row.expiry_date}</TableCell>
-                      <TableCell><Chip label={row.status} color={statusColor[row.status]} size="small" /></TableCell>
-                      <TableCell>{row.grand_total ? `₹${row.grand_total}` : ''}</TableCell>
-                      <TableCell align="center">
-                        <IconButton onClick={(e) => handleMenuOpen(e, index)}><MoreVertIcon /></IconButton>
-                        {menuIndex === index && (
-                          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { width: 200 } }}>
-                            <MenuItem onClick={() => handleEditInvoice(row.invoice_id)}><EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit</MenuItem>
-                            <MenuItem onClick={() => handleDownloadPdf(row)}><PictureAsPdfIcon fontSize="small" sx={{ mr: 1 }} /> Download the PDF</MenuItem>
-                            <MenuItem onClick={() => handleDownloadPdf(row)}><PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print Invoice</MenuItem>
-                            <MenuItem onClick={() => handleSendEmail(row)}><EmailIcon fontSize="small" sx={{ mr: 1 }} /> Send Email</MenuItem>
-                            <MenuItem onClick={() => handleShareLink(row)}><ShareIcon fontSize="small" sx={{ mr: 1 }} /> Share Link</MenuItem>
-                            <MenuItem onClick={async () => {
-                              try {
-                                await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Paid' });
-                                setInvoices(prev => prev.map(inv => inv.invoice_id === row.invoice_id ? { ...inv, status: 'Paid' } : inv));
-                                handleMenuClose();
-                              } catch (error) {
-                                console.error('Error updating status:', error);
-                                alert('Failed to update invoice status');
-                              }
-                            }}>Mark as Paid</MenuItem>
-                            <MenuItem onClick={async () => {
-                              try {
-                                await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Partial' });
-                                setInvoices(prev => prev.map(inv => inv.invoice_id === row.invoice_id ? { ...inv, status: 'Partial' } : inv));
-                                handleMenuClose();
-                              } catch (error) {
-                                console.error('Error updating status:', error);
-                                alert('Failed to update invoice status');
-                              }
-                            }}>Mark as Partial</MenuItem>
-                            <MenuItem onClick={async () => {
-                              try {
-                                await axios.patch(`${BASE_URL}/invoice/${row.invoice_id}/status`, { status: 'Draft' });
-                                setInvoices(prev => prev.map(inv => inv.invoice_id === row.invoice_id ? { ...inv, status: 'Draft' } : inv));
-                                handleMenuClose();
-                              } catch (error) {
-                                console.error('Error updating status:', error);
-                                alert('Failed to update invoice status');
-                              }
-                            }}>Mark as Draft</MenuItem>
-                          </Menu>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Paper>
-          </Paper>
+  if (loading) {
+    return (
+      <AppLayout title="Invoices">
+        <LoadingState message="Loading invoices..." />
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout title="Invoices">
+        <ErrorState message={error} />
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout title="Invoices">
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 3 } }}>
+        <PageHeader title="All Invoices" count={filteredInvoices.length}>
+          <Button variant="contained" sx={{ textTransform: 'none' }} onClick={handleNewInvoice}>
+            + New Invoice
+          </Button>
+        </PageHeader>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {['All Invoices', 'Sent Invoices', 'Draft Invoices', 'Pro Forma Invoices'].map((label) => (
+              <Button
+                key={label}
+                onClick={() => setSelectedFilter(label)}
+                variant={selectedFilter === label ? 'contained' : 'outlined'}
+                sx={{ textTransform: 'none', borderRadius: 5, px: 2, height: 36 }}
+              >
+                {label}
+              </Button>
+            ))}
+          </Box>
+          <SearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Search by invoice no, customer..."
+            debounceMs={200}
+            width={{ xs: '100%', sm: 300 }}
+          />
         </Box>
-      </Box>
-    </Box>
+
+        <DataTable
+          columns={invoiceColumns}
+          rows={filteredInvoices}
+          rowKey="invoice_id"
+          getRowId={(row) => row.invoice_id}
+          emptyMessage="No invoices found"
+        />
+      </Paper>
+    </AppLayout>
   );
 }

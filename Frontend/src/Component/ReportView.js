@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Box, Typography, Paper, CircularProgress, Alert, Avatar, InputBase,
+  Box, Typography, Paper, CircularProgress, Alert,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import axios from 'axios';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import BASE_URL from '../config/api';
 
 const API = `${BASE_URL}`;
@@ -211,25 +208,7 @@ const ReportView = () => {
   const view = useMemo(() => state.data, [state.data]);
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ backgroundColor: '#fff', p: 2, px: 3, borderBottom: '1px solid #e2e8f0',
-                   display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" fontWeight="bold">{cfg ? cfg.title : 'Report'}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f1f5f9',
-                       px: 2, py: 0.5, borderRadius: '8px' }}>
-              <SearchIcon fontSize="small" sx={{ mr: 1 }} />
-              <InputBase placeholder="Search..." />
-            </Box>
-            <NotificationsNoneIcon />
-            <UserMenu />
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-          </Box>
-        </Box>
-
-        <Box sx={{ p: 3 }}>
+    <AppLayout title="Report">
           <Paper elevation={0} sx={{ p: 3, borderRadius: '12px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <Typography variant="h6" fontWeight="bold">{cfg ? cfg.title : 'Unknown Report'}</Typography>
@@ -266,9 +245,7 @@ const ReportView = () => {
               </TableContainer>
             )}
           </Paper>
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

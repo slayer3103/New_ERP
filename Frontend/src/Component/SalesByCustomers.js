@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   InputBase,
-  IconButton,
   Avatar,
   CircularProgress,
   Alert,
@@ -24,7 +23,6 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PeopleIcon from '@mui/icons-material/People';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
@@ -34,8 +32,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import StarIcon from '@mui/icons-material/Star';
-import Sidebar from './Sidebar';
-import UserMenu from './UserMenu';
+import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 import {
@@ -146,35 +143,7 @@ const SalesByCustomers = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-
-        {/* Header */}
-        <Box sx={{ backgroundColor: '#fff', p: 2, px: 3, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1, borderRadius: '10px', bgcolor: '#3b82f615', display: 'flex' }}>
-              <PeopleIcon sx={{ color: '#3b82f6' }} />
-            </Box>
-            <Box>
-              <Typography variant="h6" fontWeight="bold" color="#1e293b" lineHeight={1.2}>Sales By Customers</Typography>
-              <Typography variant="caption" color="text.secondary">Customer revenue analytics & insights</Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f1f5f9', px: 2, py: 0.5, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-              <SearchIcon fontSize="small" sx={{ mr: 1, color: '#64748b' }} />
-              <InputBase placeholder="Search analytics..." sx={{ fontSize: '14px' }} />
-            </Box>
-            <IconButton sx={{ color: '#64748b' }}><NotificationsNoneIcon /></IconButton>
-            <UserMenu />
-            <Avatar src="/avatar.png" sx={{ width: 32, height: 32 }} />
-          </Box>
-        </Box>
-
-        {/* Content */}
-        <Box sx={{ p: 3, flexGrow: 1 }}>
-
+    <AppLayout title="Sales By Customers">
           {/* Hero Banner */}
           <Paper elevation={0} sx={{
             p: 4, borderRadius: '20px', mb: 3,
@@ -427,9 +396,7 @@ const SalesByCustomers = () => {
               </Paper>
             </>
           ) : null}
-        </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 

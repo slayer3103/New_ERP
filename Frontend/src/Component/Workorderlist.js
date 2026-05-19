@@ -10,7 +10,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import PrintIcon from "@mui/icons-material/Print";
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ui from '../assets/mera.png';
@@ -808,52 +808,9 @@ const WorkOrderlist = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', bgcolor: '#F9FAFB' }}>
-      <Sidebar />
-
-      <Box sx={{ flexGrow: 1 }}>
-        <Box
-          sx={{
-            height: 60,
-            borderBottom: '1px solid #eee',
-            display: 'flex',
-            alignItems: 'center',
-            px: 3,
-            justifyContent: 'space-between',
-            bgcolor: '#fff'
-          }}
-        >
-          <Typography fontWeight="bold">Work Order</Typography>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#F0F0F0',
-                px: 2,
-                py: 0.5,
-                borderRadius: 5,
-                minWidth: 250
-              }}
-            >
-              <SearchIcon fontSize="small" sx={{ color: '#555' }} />
-              <InputBase
-                placeholder="Search customer name..."
-                sx={{ ml: 1, flex: 1, fontSize: 14 }}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </Box>
-            <IconButton><NotificationsNoneIcon /></IconButton>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Avatar src="https://i.pravatar.cc/40?img=1" />
-              <Typography fontSize={14}>Admin name</Typography>
-              <ArrowDropDownIcon />
-            </Box>
-          </Box>
-        </Box>
-
-        <Box sx={{ p: 3 }}>
+    <>
+    <AppLayout title="Work Orders">
+        <Box>
           <Paper sx={{ backgroundColor: '#fff', p: 3, borderRadius: 2 }}>
             <Box display="flex" justifyContent="space-between" mb={2}>
               <Typography variant="h6" fontWeight="bold">Work Order</Typography>
@@ -918,7 +875,7 @@ const WorkOrderlist = () => {
             </Table>
           </Paper>
         </Box>
-      </Box>
+    </AppLayout>
 
       <Menu
         anchorEl={menuAnchor}
@@ -932,7 +889,7 @@ const WorkOrderlist = () => {
         <MenuItem onClick={() => handlePrintWorkOrder(selectedOrder)}><PrintIcon fontSize="small" sx={{ mr: 1 }} /> Print Work Order</MenuItem>
         <MenuItem onClick={() => handleShareLink(selectedOrder)}>Share Link</MenuItem>
       </Menu>
-    </Box>
+    </>
   );
 };
 

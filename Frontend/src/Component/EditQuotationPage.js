@@ -4,14 +4,13 @@ import { Box, TextField, Button, Paper, Typography, FormControl, InputLabel, Sel
 
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import AddIcon from "@mui/icons-material/Add";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import jsPDF from "jspdf";
 import axios from 'axios';
-import UserMenu from './UserMenu';
 import BASE_URL from '../config/api';
 
 export default function EditQuotationPage() {
@@ -146,25 +145,8 @@ export default function EditQuotationPage() {
 
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1 }}>
-        {/* Header */}
-        <Box sx={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          p: 2, 
-          borderBottom: "1px solid #e0e0e0" 
-        }}>
-          <Typography variant="h6" fontWeight={600}>
-            Edit Quotation
-          </Typography>
-          <UserMenu />
-        </Box>
-
-        {/* Main Content */}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3, p: 2 }}>
+    <AppLayout title="Edit Quotation">
+        <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
           <Paper sx={{ width: 800, p: 4, borderRadius: 3 }}>
           <Typography variant="h5" fontWeight={600} mb={3} textAlign="center">
             Edit Quotation
@@ -355,7 +337,6 @@ export default function EditQuotationPage() {
           </form>
         </Paper>
       </Box>
-    </Box>
-    </Box>
+    </AppLayout>
   );
 }

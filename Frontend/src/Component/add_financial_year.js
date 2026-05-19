@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import AppLayout from '../layouts/AppLayout';
 import BASE_URL from '../config/api';
 
 const AddFinancialYear = () => {
@@ -76,8 +76,7 @@ const AddFinancialYear = () => {
   };
 
   return (
-    <>
-      <Sidebar />
+    <AppLayout title="Add Financial Year">
       <div style={{ padding: '30px', maxWidth: '500px', margin: '0 auto' }}>
         <h2>➕ Add New Financial Year</h2>
 
@@ -122,7 +121,7 @@ const AddFinancialYear = () => {
           </button>
         </form>
       </div>
-    </>
+    </AppLayout>
   );
 };
 

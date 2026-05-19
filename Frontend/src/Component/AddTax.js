@@ -5,19 +5,12 @@ import {
   TextField,
   MenuItem,
   Button,
-  IconButton,
-  InputBase,
-  Avatar,
   Paper,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import AppLayout from '../layouts/AppLayout';
 import axios from "axios";
-import UserMenu from './UserMenu';
 import BASE_URL from '../config/api';
 
 const AddTax = () => {
@@ -61,57 +54,8 @@ const AddTax = () => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, bgcolor: "#F9FAFB", minHeight: "100vh" }}>
-        {/* Header */}
-        <Box
-          sx={{
-            height: 60,
-            borderBottom: "1px solid #eee",
-            display: "flex",
-            alignItems: "center",
-            px: 3,
-            justifyContent: "space-between",
-            bgcolor: "#fff",
-          }}
-        >
-          <Typography fontWeight="bold" fontSize={18}>
-            Tax &nbsp;/&nbsp; <span style={{ fontWeight: 400 }}>Add Tax</span>
-          </Typography>
-
-          <Box display="flex" alignItems="center" gap={2}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                bgcolor: "#F0F0F0",
-                px: 2,
-                py: 0.5,
-                borderRadius: 5,
-                minWidth: 250,
-              }}
-            >
-              <SearchIcon fontSize="small" sx={{ color: "#555" }} />
-              <InputBase
-                placeholder="Search anything here..."
-                sx={{ ml: 1, flex: 1, fontSize: 14 }}
-              />
-            </Box>
-
-            <IconButton>
-              <NotificationsNoneIcon />
-            </IconButton>
-
-            <Box display="flex" alignItems="center" gap={1}>
-              <NotificationsNoneIcon />
-              <UserMenu />
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Main Form */}
-        <Box sx={{ px: 4, py: 4 }}>
+    <AppLayout title="Add Tax">
+        <Box>
           <Paper sx={{ p: 1, borderRadius: 2 }}>
             <Box sx={{ p: 3 }}>
               <Box
@@ -222,8 +166,7 @@ const AddTax = () => {
             </Box>
           </Paper>
         </Box>
-      </Box>
-    </Box>
+    </AppLayout>
   );
 };
 
