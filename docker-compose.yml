@@ -1,0 +1,70 @@
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: erp_mysql3
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      MYSQL_DATABASE: erp_database
+      MYSQL_USER: erp_user
+      MYSQL_PASSWORD: erp_password123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - erp_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+      start_period: 60s
+
+  # Backend Service
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: erp_backend3
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_USER: erp_user
+      DB_PASSWORD: erp_password123
+      DB_NAME: erp_database
+      NODE_ENV: production
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - erp_network
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: erp_frontend3
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - erp_network
+
+volumes:
+  mysql_data:
+
+networks:
+  erp_network:
+    driver: bridge

@@ -1,0 +1,78 @@
+# ERP System
+
+A comprehensive Enterprise Resource Planning (ERP) System built to streamline and manage business operations. This application provides robust features for managing customers, vendors, products, invoices, quotations, purchase orders, work orders, and financial data.
+
+## Features
+
+- **Authentication & Authorization**: Secure login and user management.
+- **Dashboard & Analytics**: Visualize sales, inventory, and business metrics using interactive charts.
+- **Customer & Vendor Management**: Maintain records of clients and suppliers.
+- **Inventory & Product Management**: Track products, categories, and product units.
+- **Sales & Invoicing**: Create and manage quotations, proforma invoices, and final invoices. Generate and export PDF invoices.
+- **Purchasing**: Manage purchase orders effectively.
+- **Work Orders**: Track and manage production or service work orders.
+- **Financial & Tax Settings**: Configure financial years and tax rates seamlessly.
+
+## Tech Stack
+
+### Frontend
+- **React.js** (v18)
+- **Redux Toolkit** (State Management)
+- **Material-UI (MUI)** (Component Library & Icons)
+- **Recharts** (Data Visualization)
+- **jsPDF & jsPDF-AutoTable** (PDF Generation)
+- **Axios** (API Requests)
+
+### Backend
+- **Node.js & Express.js** (REST API)
+- **MySQL2** (Database Driver)
+- **bcryptjs** (Password Hashing)
+- **Multer** (File Uploads)
+
+### Infrastructure & Database
+- **MySQL 8.0**
+- **Docker & Docker Compose** (Containerization)
+
+## Getting Started
+
+### Prerequisites
+- [Docker](https://www.docker.com/get-started) and Docker Compose installed on your system.
+
+### Installation & Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository_url>
+   cd ERP-Software
+   ```
+
+2. **Start the application using Docker Compose:**
+   ```bash
+   docker-compose up -d --build
+   ```
+   This command will spin up three containers:
+   - `erp_mysql3` (Database on port 3307)
+   - `erp_backend3` (API on port 5000)
+   - `erp_frontend3` (React App on port 80)
+
+3. **Database Initialization:**
+   The database tables and initial schema are automatically set up using the init scripts mounted in the MySQL container. You can also run `setup_db.py` to initialize the database setup script.
+
+4. **Access the application:**
+   - **Frontend:** http://localhost (or port 80)
+   - **Backend API:** http://localhost:5000
+
+## Development Setup (Without Docker)
+
+If you wish to run the project locally without Docker:
+
+### Backend
+1. Navigate to the `Backend` directory: `cd Backend`
+2. Install dependencies: `npm install`
+3. Configure your MySQL database and update the database configuration in `config/db.js` or via environment variables.
+4. Start the server: `npm run dev`
+
+### Frontend
+1. Navigate to the `front` directory: `cd front`
+2. Install dependencies: `npm install`
+3. Start the React app: `npm start`
