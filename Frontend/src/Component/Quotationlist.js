@@ -18,19 +18,12 @@ import {
   Pagination,
   Checkbox,
   TextField,
-  Avatar,
   Paper,
-  InputBase,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AppLayout from '../layouts/AppLayout';
 import AddIcon from "@mui/icons-material/Add";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import axios from "axios";
 import ui from '../assets/mera.png';
 import BASE_URL from '../config/api';
@@ -43,13 +36,6 @@ export default function QuotationListPage() {
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // Company details for PDF
-  const [gstin, setGstin] = useState("27AAJCM9223E1ZX");
-  const [udyam, setUdyam] = useState("UDYAM-MH-33-0039389");
-  const [iso, setIso] = useState("ISO 9001:2015");
-  const [merakiExpert, setMerakiExpert] = useState("Meraki Expert Team");
-  const [customerEmail, setCustomerEmail] = useState("customer@example.com");
-  const [merakiEmail, setMerakiEmail] = useState("info@merakiexpert.com");
 
   React.useEffect(() => {
     const fetchQuotations = async () => {
@@ -103,7 +89,6 @@ export default function QuotationListPage() {
     const location = customerData ? formatAddress(customerData) : (quotation.location || '');
     const contactNumber = customerData?.mobile || customerData?.office_no || quotation.contact_number || '';
     const merakiExpert = quotation.meraki_expert || 'Meraki Expert';
-    const merakiPhone = quotation.meraki_phone || '7722005969';
     const customerEmail = customerData?.email || quotation.email || '';
     const merakiEmail = quotation.meraki_email || 'piral.k@merakkiexpert.in';
     const quotationSubject = 'Quotation - Supply & Installation of PUR Panel.';

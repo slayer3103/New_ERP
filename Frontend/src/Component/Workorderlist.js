@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Button, InputBase, IconButton, Avatar, Chip,
+  Box, Typography, Button, IconButton, Chip,
   Table, TableHead, TableRow, TableCell, TableBody, Menu, MenuItem,
   Paper
 } from '@mui/material';

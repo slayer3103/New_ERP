@@ -22,16 +22,13 @@ const statusColorMap = {
 
 const ProformaInvoicelist = () => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(null);
 
-  const handleMenuClick = (event, index) => {
+  const handleMenuClick = (event) => {
     setMenuAnchor(event.currentTarget);
-    setSelectedIndex(index);
   };
 
   const handleClose = () => {
     setMenuAnchor(null);
-    setSelectedIndex(null);
   };
 
   return (
@@ -99,7 +96,7 @@ const ProformaInvoicelist = () => {
                     </TableCell>
                     <TableCell>{row.amount}</TableCell>
                     <TableCell align="center">
-                      <IconButton onClick={(e) => handleMenuClick(e, i)}>
+                      <IconButton onClick={handleMenuClick}>
                         <MoreVertIcon />
                       </IconButton>
                     </TableCell>

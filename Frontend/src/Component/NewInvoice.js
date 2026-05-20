@@ -20,8 +20,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Avatar,
-  InputBase,
   Breadcrumbs,
   CircularProgress,
   Alert,
@@ -30,14 +28,11 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "../layouts/AppLayout";
 import axios from "axios";
-import UserMenu from './UserMenu';
 import BASE_URL from '../config/api';
 
 const NewInvoicePage = () => {
@@ -45,7 +40,6 @@ const NewInvoicePage = () => {
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
-  const [customerTab, setCustomerTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");

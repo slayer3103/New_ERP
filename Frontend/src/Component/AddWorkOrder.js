@@ -15,14 +15,12 @@ import {
   Modal,
   Tabs,
   Tab,
-  InputBase,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Avatar,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,14 +28,9 @@ import { useState, useEffect } from 'react';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import { Breadcrumbs } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import CloseIcon from '@mui/icons-material/Close';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import BASE_URL from '../config/api';
 
 const NewWorkOrder = () => {
@@ -69,8 +62,8 @@ const NewWorkOrder = () => {
 * As per drawing, If any misconduct is observed the contractor shall be penalized.
 * All The Machines and Tools should be Ready with Safety Before Reaching on site.
 * After completion of installation debries cleaning is mandatory.`);
-  const [attachmentUrl, setAttachmentUrl] = useState('');
-  const [status, setStatus] = useState('Draft');
+  const [attachmentUrl] = useState('');
+  const [status] = useState('Draft');
   const [purchaseordernumber, setpurchaseordernumber] = useState('');
   const [purchaseorderdate, setpurchaseorderdate] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});

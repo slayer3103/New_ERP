@@ -172,10 +172,7 @@ export default function VendorListPage() {
     setSelectedVendor(null);
   };
 
-  const handleDeleteClick = () => {
-    setOpenDialog(true);
-    setAnchorEl(null);
-  };
+
 
   const confirmDelete = async () => {
     try {

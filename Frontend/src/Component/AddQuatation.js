@@ -12,12 +12,10 @@ import {
   IconButton,
   Paper,
   Divider,
-  Avatar,
   CircularProgress,
   Snackbar,
   Alert,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AppLayout from '../layouts/AppLayout';
 import {
@@ -32,12 +30,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useNavigate } from "react-router-dom";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import SearchIcon from "@mui/icons-material/Search";
-import InputBase from "@mui/material/InputBase";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import axios from "axios";
 import BASE_URL from '../config/api';
 
@@ -66,7 +58,7 @@ export default function NewQuotation() {
     "                     arrangement for installation activities, Scrap folding, Scissor lift."
   );
 
-  const [attachment, setAttachment] = useState(null);
+
   const [rows, setRows] = useState([
     {
       id: Date.now(),
@@ -85,9 +77,6 @@ export default function NewQuotation() {
   const [success, setSuccess] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [products, setProducts] = useState([]);
-  const [itemModalOpen, setItemModalOpen] = useState(false);
-  const [itemSearchTerm, setItemSearchTerm] = useState("");
-  const [previewOpen, setPreviewOpen] = useState(false);
   const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [quoteNumber, setQuoteNumber] = useState("");
@@ -223,7 +212,6 @@ export default function NewQuotation() {
       setError("File size exceeds 10MB limit");
       return;
     }
-    setAttachment(file);
   };
 
   const validate = () => {
@@ -498,8 +486,6 @@ export default function NewQuotation() {
                   variant="text"
                   sx={{ fontWeight: 500, color: "#1976d2" }}
                   onClick={() => {
-                    setItemModalOpen(true);
-                    setItemSearchTerm("");
                   }}
                 >
                   + ADD ITEMS IN BULK
@@ -825,7 +811,7 @@ export default function NewQuotation() {
                     textTransform: "none",
                     fontWeight: "bold",
                   }}
-                  onClick={() => setPreviewOpen(true)}
+                  onClick={() => {}}
                 >
                   Preview Quotation
                 </Button>

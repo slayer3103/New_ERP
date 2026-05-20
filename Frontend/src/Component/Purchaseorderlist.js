@@ -16,18 +16,13 @@ import {
   Menu,
   MenuItem,
   Checkbox,
-  Avatar,
-  InputBase,
   Tabs,
   Tab,
-  Breadcrumbs,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import AppLayout from '../layouts/AppLayout';
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import ui from '../assets/mera.png';
 
 import axios from "axios";
@@ -284,10 +279,6 @@ const PurchaseOrderActions = () => {
       console.error('Error details:', error.response?.data || error.message);
       alert('Failed to download PDF. Please check console for details.');
     }
-  };
-
-  const handlePrintOrder = async (order) => {
-    // Placeholder for print functionality (can reuse handleDownloadPdf logic if needed)
   };
 
   const handleSendEmail = (order) => {

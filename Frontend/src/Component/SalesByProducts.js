@@ -46,7 +46,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LabelList,
 } from 'recharts';
 
 const GRADIENT_COLORS = ['#8b5cf6', '#6d28d9', '#7c3aed', '#5b21b6', '#4c1d95'];

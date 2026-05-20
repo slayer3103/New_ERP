@@ -15,7 +15,7 @@ import {
   Modal,
   Tabs,
   Tab,
-  InputBase, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,Avatar
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,43 +27,28 @@ import {
 import {
   Search,
 } from '@mui/icons-material';
-import { Breadcrumbs } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import CloseIcon from '@mui/icons-material/Close';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import UserMenu from './UserMenu';
 const NewProFormaInvoice = () => {
 const navigate =useNavigate()
-  const [customers, setCustomers] = useState(['Customer 1', 'Customer 2']);
+  const [customers] = useState(['Customer 1', 'Customer 2']);
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [customerTab, setCustomerTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const handleAddCustomer = () => {
     setCustomerModalOpen(true);
   }
-  const [items, setItems] = useState(['Item 1', 'Item 2']);
-  const [itemModalOpen, setItemModalOpen] = useState(false);
-  const [itemSearchTerm, setItemSearchTerm] = useState('');
   const [rows, setRows] = useState([
     { item: '', qty: 0, rate: 0, discount: 0, amount: 0 },
   ]);
 
 
 
-  const handleItemSelect = (rowIndex, itemName) => {
-    const updatedRows = [...rows];
-    updatedRows[rowIndex].item = itemName;
-    setRows(updatedRows);
-    setItemModalOpen(false);
-  };
+
 
 
   const updateRow = (index, field, value) => {
@@ -280,9 +265,6 @@ const navigate =useNavigate()
                           value={row.item}
                           InputProps={{ readOnly: true }}
                           onClick={() => {
-                            setSelectedRowIndex(index);
-                            setItemModalOpen(true);
-                            setItemSearchTerm('');
                           }}
                           size="small"
                         />

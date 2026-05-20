@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Typography, Button, TextField, Tabs, Tab, Table, TableHead, TableRow, TableCell, TableBody,
-  IconButton, Menu, MenuItem, Chip, Checkbox, InputAdornment, Paper, Pagination
+  IconButton, Menu, MenuItem, Chip, Checkbox, InputAdornment, Paper
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import SearchIcon from '@mui/icons-material/Search';
 import AppLayout from '../layouts/AppLayout';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

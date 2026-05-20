@@ -19,7 +19,6 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';

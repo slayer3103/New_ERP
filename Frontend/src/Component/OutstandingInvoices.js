@@ -5,7 +5,6 @@ import {
   Paper,
   Card,
   CardContent,
-  Avatar,
   CircularProgress,
   Alert,
   Table,
@@ -18,7 +17,6 @@ import {
   Divider,
   InputBase,
 } from '@mui/material';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';

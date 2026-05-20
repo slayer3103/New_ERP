@@ -5,16 +5,11 @@ import {
   TextField,
   MenuItem,
   Button,
-  IconButton,
-  Avatar,
-  InputBase,
   Grid,
   Paper,
   Alert,
   CircularProgress,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import AppLayout from '../layouts/AppLayout';
 import { useNavigate } from 'react-router-dom';

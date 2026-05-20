@@ -30,7 +30,6 @@ export default function CustomerList() {
     const [selectedCustomers, setSelectedCustomers] = useState([]);
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
-    const [openDelete, setOpenDelete] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [editErrors, setEditErrors] = useState({});
@@ -149,7 +148,7 @@ export default function CustomerList() {
     const toggleCustomerStatus = async (customer) => {
         const newStatus = customer.status === 'Active' ? 'Inactive' : 'Active';
         try {
-            const response = await fetch(`${BASE_URL}/customers/${customer.id}/status`, {
+            await fetch(`${BASE_URL}/customers/${customer.id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })

@@ -26,7 +26,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import PeopleIcon from '@mui/icons-material/People';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import PieChartIcon from '@mui/icons-material/PieChart';
@@ -47,10 +46,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
 } from 'recharts';
 
 const PIE_COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#6366f1', '#f97316', '#06b6d4'];

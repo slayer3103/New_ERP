@@ -5,7 +5,6 @@ import {
   Paper,
   Card,
   CardContent,
-  Avatar,
   CircularProgress,
   Alert,
   Table,
@@ -18,7 +17,6 @@ import {
   Grid,
   Divider,
 } from '@mui/material';
-import GavelIcon from '@mui/icons-material/Gavel';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';

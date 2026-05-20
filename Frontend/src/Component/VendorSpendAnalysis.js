@@ -19,7 +19,6 @@ import {
   Divider,
   LinearProgress,
 } from '@mui/material';
-import StorefrontIcon from '@mui/icons-material/Storefront';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';

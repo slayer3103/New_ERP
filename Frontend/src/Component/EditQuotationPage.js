@@ -3,13 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Paper, Typography, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Divider } from "@mui/material";
 
 
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AppLayout from '../layouts/AppLayout';
-import AddIcon from "@mui/icons-material/Add";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import jsPDF from "jspdf";
 import axios from 'axios';
 import BASE_URL from '../config/api';
 

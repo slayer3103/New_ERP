@@ -5,7 +5,6 @@ import {
   Paper,
   Card,
   CardContent,
-  Avatar,
   InputBase,
   CircularProgress,
   Alert,

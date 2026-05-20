@@ -3,10 +3,8 @@ import {
   Box, Typography, Button, IconButton, Chip, Menu,
   Table, TableHead, TableBody, TableRow, TableCell, TablePagination, MenuItem
 } from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import AppLayout from '../layouts/AppLayout';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -15,7 +13,6 @@ import BASE_URL from '../config/api';
 const Taxlist = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedRow, setSelectedRow] = useState(null);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const [taxes, setTaxes] = useState([]);
   const [filter, setFilter] = useState('All');
@@ -24,13 +21,11 @@ const Taxlist = () => {
 
   const handleClick = (event, rowIndex) => {
     setAnchorEl(event.currentTarget);
-    setSelectedRow(rowIndex);
     setSelectedRowData(filteredTaxes[rowIndex]);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
-    setSelectedRow(null);
     setSelectedRowData(null);
   };
 

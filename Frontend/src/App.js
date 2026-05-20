@@ -11,13 +11,10 @@ import CustomerList from './Component/Customerlist';
 import ItemsPage from './Component/Items';
 import AddItem from './Component/Additem';
 import ItemList from './Component/Itemlist';
-import FirstTimePurchaseOrder from './Component/Purchaseorder';
 import PurchaseOrderForm from './Component/NewpurchaseOrder';
 import PurchaseOrderList from './Component/Purchaseorderlist';
 import NewVendorForm from './Component/Addvendors';
-import Vendors from './Component/Vendors';
 import VendorListPage from './Component/Vendorslist';
-import Quotation from './Component/Quotation';
 import NewQuotation from './Component/AddQuatation';
 import QuotationListPage from './Component/Quotationlist';
 import Tax from './Component/Tax';
@@ -25,13 +22,10 @@ import AddTax from './Component/AddTax';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import Taxlist from './Component/Taxlist';
-import WorkOrder from './Component/WorkOrder';
 import NewWorkOrder from './Component/AddWorkOrder';
 import WorkOrderlist from './Component/Workorderlist';
-import ProFormaInvoice from './Component/ProFormaInvoice';
 import NewProFormaInvoice from './Component/AddproFrmainvoice';
 import ProformaInvoicelist from './Component/Proformainvoicelist';
-import FinancialYearSettings from './Component/Financialyearsetting';
 import PaymentsSettings from './Component/Paymentsetting';
 import AddPaymentsEntry from './Component/Addpaymententry';
 import ReportsAndAnalytics from './Component/ReportandAnalytics';
@@ -57,7 +51,7 @@ import EditWorkOrderPage from './Component/EditWorkOrder';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, role } = useSelector((state) => state.auth);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

@@ -5,13 +5,10 @@ import {
   Divider, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, LinearProgress,
 } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import PeopleIcon from '@mui/icons-material/People';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AppLayout from '../layouts/AppLayout';
