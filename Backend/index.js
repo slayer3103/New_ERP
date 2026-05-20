@@ -13,7 +13,10 @@ const allowedOrigins = [
   "https://erp-system-git-main-saurabhshendurkar3103-8214s-projects.vercel.app",
   "https://new-erp-git-main-saurabhshendurkar3103-8214s-projects.vercel.app",
   "https://new-8mw8fl6df-saurabhshendurkar3103-8214s-projects.vercel.app",
-  "https://new-erp-one.vercel.app"
+  "https://new-erp-one.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "http://127.0.0.1:3000"
 ];
 
 

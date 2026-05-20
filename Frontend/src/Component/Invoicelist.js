@@ -104,6 +104,20 @@ export default function Invoicelist() {
         return `${convert(Math.floor(num))} Rupees Only`;
       };
 
+      // Convert logo to base64 so it renders in the print window
+      let logoBase64 = '';
+      try {
+        const imgResponse = await fetch(ui);
+        const blob = await imgResponse.blob();
+        logoBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch (e) {
+        console.warn('Could not load logo:', e);
+      }
+
       // Open print window with dynamic data
       const printWindow = window.open("", "_blank");
       printWindow.document.write(`
@@ -840,7 +854,7 @@ export default function Invoicelist() {
         <div class="invoice-containertwo">
             <div class="header-section">
                 <div class="header-logo">
-                    <img  src=${ui} style="width: 230px; height: 160px; margin-top: -50px; margin-bottom: -70px;"
+                    <img  src="${logoBase64 || ''}" style="width: 230px; height: 160px; margin-top: -50px; margin-bottom: -70px;"
                         alt="Logo" />
 
                 </div>
@@ -1081,7 +1095,7 @@ export default function Invoicelist() {
                             MERAKI
                             EXPERT</b></p>
 
-                    <img src="new.png" style="width: 90px; height: 70px;  margin-bottom: -60px;" alt="Logo" />
+
 
 
                     <span class="auth-sign">Authorized Signatory</span>
@@ -1102,7 +1116,14 @@ export default function Invoicelist() {
 
       `);
       printWindow.document.close();
-      printWindow.print();
+      // Wait for all content/images to load, then print
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      // Fallback in case onload already fired
+      if (printWindow.document.readyState === 'complete') {
+        printWindow.print();
+      }
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Failed to generate PDF. Please try again.");
