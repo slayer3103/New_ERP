@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useSelector } from 'react-redux';
 import Login from './Component/Login';
 import Dashboard from './Component/Dashboard';
-import InvoicePage from './Component/Invoice';
 import NewInvoicePage from './Component/NewInvoice';
 import Invoicelist from './Component/Invoicelist';
 import CustomerPage from './Component/Customer';

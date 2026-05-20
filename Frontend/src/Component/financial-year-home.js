@@ -46,9 +46,6 @@ const FinancialYearMain = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    navigate(`/edit-financial-year/${id}`);
-  };
 
   return (
     <AppLayout title="Financial Year">

@@ -55,7 +55,7 @@ const AddFinancialYear = () => {
     }
 
     try {
-      const res = await axios.post(`${BASE_URL}/financialYear/add`, {
+      await axios.post(`${BASE_URL}/financialYear/add`, {
         start_date: startDate,
         end_date: endDate
       });

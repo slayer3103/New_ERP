@@ -4,9 +4,6 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody, Menu, MenuItem,
   Paper
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import PrintIcon from "@mui/icons-material/Print";
@@ -28,7 +25,7 @@ const WorkOrderlist = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [tab, setTab] = useState('All');
   const [workOrders, setWorkOrders] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -76,37 +73,6 @@ const WorkOrderlist = () => {
     handleClose();
   };
 
-  const numberToWords = (num) => {
-    const units = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-    const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-    const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-    const thousands = ["", "Thousand", "Lakh", "Crore"];
-
-    const convertLessThanThousand = (num) => {
-      if (num === 0) return "";
-      if (num < 10) return units[num];
-      if (num < 20) return teens[num - 10];
-      if (num < 100) return `${tens[Math.floor(num / 10)]} ${units[num % 10]}`.trim();
-      return `${units[Math.floor(num / 100)]} Hundred ${convertLessThanThousand(num % 100)}`.trim();
-    };
-
-    const convert = (num) => {
-      if (num === 0) return "Zero";
-      let result = "";
-      let thousandIndex = 0;
-      while (num > 0) {
-        const chunk = num % 1000;
-        if (chunk > 0) {
-          result = `${convertLessThanThousand(chunk)} ${thousands[thousandIndex]} ${result}`.trim();
-        }
-        num = Math.floor(num / 1000);
-        thousandIndex++;
-      }
-      return result;
-    };
-
-    return `${convert(Math.floor(num))} Rupees Only`;
-  };
 
   const handleDownloadPdf = async (workOrder) => {
     try {
@@ -123,9 +89,6 @@ const WorkOrderlist = () => {
       const { workOrder: workOrderData, workOrderItems, customer } = responseData;
 
       // Use totals from backend response
-      const sub_total = parseFloat(responseData.total_amount || workOrderData.sub_total || 0);
-      const cgst = parseFloat(responseData.cgst || workOrderData.cgst || 0);
-      const sgst = parseFloat(responseData.sgst || workOrderData.sgst || 0);
       const grand_total = parseFloat(responseData.grand_total || workOrderData.grand_total || 0);
       
       // Format date
@@ -134,13 +97,6 @@ const WorkOrderlist = () => {
         return date.toLocaleDateString('en-IN');
       };
       
-      // Format currency
-      const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-          style: 'currency',
-          currency: 'INR'
-        }).format(amount);
-      };
 
       // Dynamic vendor/customer details - fallback if vendor join fails
       const vendorName = customer?.billing_recipient_name || workOrderData.customer_name || 'N/A';
