@@ -71,13 +71,8 @@ const PurchaseOrderActions = () => {
 
   const handleDownloadPdf = async (order) => {
     try {
-      // Test if backend is reachable
-      console.log('Testing API endpoint...');
-      const testResponse = await axios.get(`${BASE_URL}/purchase`);
-      console.log('API test successful:', testResponse.status);
-      
-      // Fetch purchase order data from backend API using purchase order number instead of ID
-      const response = await axios.get(`${BASE_URL}/purchase/${order.purchase_order_no}`);
+      // Fetch purchase order data from backend API using numeric id
+      const response = await axios.get(`${BASE_URL}/purchase/${order.id}`);
       console.log('Purchase order data fetched:', response.data);
       
       const { purchase_order: poData, vendor } = response.data;
@@ -113,6 +108,20 @@ const PurchaseOrderActions = () => {
         </tr>
       `).join('');
   
+      // Convert logo to base64 so it renders in the print window
+      let logoBase64 = '';
+      try {
+        const imgResponse = await fetch(ui);
+        const blob = await imgResponse.blob();
+        logoBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch (e) {
+        console.warn('Could not load logo:', e);
+      }
+
       // Build HTML using dynamic data
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
@@ -128,7 +137,7 @@ const PurchaseOrderActions = () => {
     <div style="border: 2px solid #000; padding: 10px; width: 600px; margin: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 5px;">
             <div style="display: flex; align-items: center;">
-                <img src="${ui}" alt="Merraki Expert Logo" style="width: 200px; height: auto; margin-top: -70px; margin-bottom: -70px;">
+                <img src="${logoBase64 || ''}" alt="Merraki Expert Logo" style="width: 200px; height: auto; margin-top: -70px; margin-bottom: -70px;">
         
             </div>
             <div style="text-align: right;">
@@ -267,12 +276,15 @@ const PurchaseOrderActions = () => {
       
       printWindow.document.close();
       printWindow.focus();
-      
-      // Wait for content to load then print
-      setTimeout(() => {
+
+      // Wait for all content/images to load, then print
+      printWindow.onload = () => {
         printWindow.print();
-        printWindow.close();
-      }, 500);
+      };
+      // Fallback in case onload already fired
+      if (printWindow.document.readyState === 'complete') {
+        printWindow.print();
+      }
       
     } catch (error) {
       console.error('Error downloading PDF:', error);

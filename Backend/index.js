@@ -9,12 +9,22 @@ const cors = require('cors');
 
 
 const allowedOrigins = [
-  "https://erp-system-as6ukav32-saurabhshendurkar3103-8214s-projects.vercel.app",
-  "https://erp-system-git-main-saurabhshendurkar3103-8214s-projects.vercel.app",
+  // erp source 1
+  // "https://erp-system-as6ukav32-saurabhshendurkar3103-8214s-projects.vercel.app",
+  // "https://erp-system-git-main-saurabhshendurkar3103-8214s-projects.vercel.app",
+
+  //erp source 2
   "https://new-erp-git-main-saurabhshendurkar3103-8214s-projects.vercel.app",
   "https://new-8mw8fl6df-saurabhshendurkar3103-8214s-projects.vercel.app",
   "https://new-erp-one.vercel.app",
-  "https://erpbyl.vercel.app"
+
+  //erp source 3
+  "https://erpbyl.vercel.app",
+
+  // erp localhost options
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "http://127.0.0.1:3000",
 ];
 
 
