@@ -22,7 +22,7 @@ import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
 import ChartCard from '../components/common/ChartCard';
 import axios from 'axios';
 import BASE_URL from '../config/api';
-import { tokens, CHART_PALETTE } from '../theme/paletteTokens';
+import { tokens } from '../theme/paletteTokens';
 import {
   BarChart,
   Bar,

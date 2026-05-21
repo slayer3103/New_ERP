@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Paper, Grid, Button, Card, CardContent,
+  Box, Typography, Paper, Grid, Button,
   Avatar, Chip, CircularProgress, Alert,
   Divider, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, LinearProgress, IconButton,
