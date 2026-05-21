@@ -3,8 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Card,
-  CardContent,
   InputBase,
   Avatar,
   CircularProgress,
@@ -32,8 +30,12 @@ import PieChartIcon from '@mui/icons-material/PieChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
+import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
+import ChartCard from '../components/common/ChartCard';
 import axios from 'axios';
 import BASE_URL from '../config/api';
+import { tokens, CHART_PALETTE } from '../theme/paletteTokens';
 import {
   BarChart,
   Bar,
@@ -49,13 +51,12 @@ import {
 } from 'recharts';
 
 const GRADIENT_COLORS = ['#8b5cf6', '#6d28d9', '#7c3aed', '#5b21b6', '#4c1d95'];
-const PIE_COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#6366f1'];
 
 const CustomBarTooltip = ({ active, payload, label, formatCurrency }) => {
   if (active && payload && payload.length) {
     return (
       <Paper elevation={3} sx={{ p: 2, borderRadius: '12px', minWidth: 180 }}>
-        <Typography variant="subtitle2" fontWeight="bold" color="#1e293b" mb={0.5}>{label}</Typography>
+        <Typography variant="subtitle2" fontWeight="bold" color={tokens.textPrimary} mb={0.5}>{label}</Typography>
         {payload.map((entry, i) => (
           <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: entry.color }} />
@@ -113,306 +114,272 @@ const SalesByProducts = () => {
     value: parseFloat(p.total_revenue) || 0,
   }));
 
-  const StatCard = ({ title, value, icon, color, subtitle, trend }) => (
-    <Card sx={{
-      height: '100%',
-      background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-      border: `1px solid ${color}20`,
-      transition: 'all 0.3s ease',
-      '&:hover': { transform: 'translateY(-4px)', boxShadow: `0 8px 25px ${color}25` },
-    }}>
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ p: 1.5, borderRadius: '12px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </Box>
-          {trend && (
-            <Chip label={trend} size="small" sx={{ bgcolor: `${color}15`, color: color, fontWeight: 'bold', fontSize: '11px' }} />
-          )}
-        </Box>
-        <Typography variant="h4" fontWeight="bold" color={color} sx={{ mb: 0.5 }}>{value}</Typography>
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">{title}</Typography>
-        {subtitle && <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>{subtitle}</Typography>}
-      </CardContent>
-    </Card>
-  );
-
   const getRankBadge = (index) => {
-    if (index === 0) return { label: '🥇 #1', color: '#f59e0b' };
+    if (index === 0) return { label: '🥇 #1', color: tokens.chartAmber };
     if (index === 1) return { label: '🥈 #2', color: '#94a3b8' };
     if (index === 2) return { label: '🥉 #3', color: '#cd7f32' };
-    return { label: `#${index + 1}`, color: '#8b5cf6' };
+    return { label: `#${index + 1}`, color: tokens.chartViolet };
   };
 
   return (
     <AppLayout title="Sales By Products">
-          {/* Hero Banner */}
-          <Paper elevation={0} sx={{
-            p: 4, borderRadius: '20px', mb: 3,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white', position: 'relative', overflow: 'hidden'
-          }}>
-            <Box sx={{ position: 'relative', zIndex: 1 }}>
-              <Typography variant="h5" fontWeight="bold" mb={0.5}>📦 Product Sales Analytics</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                Track product performance, revenue contribution, and quantity trends across all your inventory.
-              </Typography>
-            </Box>
-            <Box sx={{ position: 'absolute', right: -30, top: -30, opacity: 0.08 }}>
-              <InventoryIcon sx={{ fontSize: 180 }} />
-            </Box>
-          </Paper>
+      {/* Hero Banner */}
+      <ReportPageHeader
+        title="📦 Product Sales Analytics"
+        subtitle="Track product performance, revenue contribution, and quantity trends across all your inventory."
+        gradientStart="#667EEA"
+        gradientEnd="#764BA2"
+        icon={InventoryIcon}
+      />
 
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 12 }}>
-              <CircularProgress size={60} sx={{ color: '#8b5cf6' }} />
-            </Box>
-          ) : error ? (
-            <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
-          ) : data ? (
-            <>
-              {/* KPI Cards */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2.5, mb: 3 }}>
-                <StatCard
-                  title="Unique Products"
-                  value={data.summary.unique_products}
-                  icon={<InventoryIcon sx={{ fontSize: 26, color: '#8b5cf6' }} />}
-                  color="#8b5cf6"
-                  subtitle="Products sold"
-                />
-                <StatCard
-                  title="Total Revenue"
-                  value={formatCurrency(data.summary.total_product_revenue)}
-                  icon={<AttachMoneyIcon sx={{ fontSize: 26, color: '#10b981' }} />}
-                  color="#10b981"
-                  subtitle="From all products"
-                />
-                <StatCard
-                  title="Qty Sold"
-                  value={new Intl.NumberFormat('en-IN').format(data.summary.total_quantity_sold || 0)}
-                  icon={<ShoppingCartIcon sx={{ fontSize: 26, color: '#3b82f6' }} />}
-                  color="#3b82f6"
-                  subtitle="Total units"
-                />
-                <StatCard
-                  title="Total Discounts"
-                  value={formatCurrency(data.summary.total_discounts)}
-                  icon={<DiscountIcon sx={{ fontSize: 26, color: '#f59e0b' }} />}
-                  color="#f59e0b"
-                  subtitle="Given on products"
-                />
-              </Box>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 12 }}>
+          <CircularProgress size={60} sx={{ color: tokens.chartViolet }} />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
+      ) : data ? (
+        <>
+          {/* KPI Cards */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 2.5 }, mb: 3 }}>
+            <AnalyticsStatCard
+              title="Unique Products"
+              value={data.summary.unique_products}
+              icon={<InventoryIcon sx={{ fontSize: 26, color: tokens.chartViolet }} />}
+              color={tokens.chartViolet}
+              subtitle="Products sold"
+            />
+            <AnalyticsStatCard
+              title="Total Revenue"
+              value={formatCurrency(data.summary.total_product_revenue)}
+              icon={<AttachMoneyIcon sx={{ fontSize: 26, color: tokens.chartGreen }} />}
+              color={tokens.chartGreen}
+              subtitle="From all products"
+            />
+            <AnalyticsStatCard
+              title="Qty Sold"
+              value={new Intl.NumberFormat('en-IN').format(data.summary.total_quantity_sold || 0)}
+              icon={<ShoppingCartIcon sx={{ fontSize: 26, color: tokens.chartBlue }} />}
+              color={tokens.chartBlue}
+              subtitle="Total units"
+            />
+            <AnalyticsStatCard
+              title="Total Discounts"
+              value={formatCurrency(data.summary.total_discounts)}
+              icon={<DiscountIcon sx={{ fontSize: 26, color: tokens.chartAmber }} />}
+              color={tokens.chartAmber}
+              subtitle="Given on products"
+            />
+          </Box>
 
-              {/* Charts Section */}
-              <Grid container spacing={3} sx={{ mb: 3 }}>
-                {/* Bar Chart — Top 10 Products by Revenue */}
-                <Grid item xs={12} lg={8}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                      <Box>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1e293b">Top 10 Products — Revenue vs Discount</Typography>
-                        <Typography variant="caption" color="text.secondary">Comparing revenue earned vs discount given per product</Typography>
-                      </Box>
-                      <ToggleButtonGroup size="small" value={chartView} exclusive onChange={(e, v) => v && setChartView(v)} sx={{ '& .MuiToggleButton-root': { borderRadius: '8px', border: '1px solid #e2e8f0', px: 1.5 } }}>
-                        <ToggleButton value="bar"><BarChartIcon fontSize="small" /></ToggleButton>
-                        <ToggleButton value="pie"><PieChartIcon fontSize="small" /></ToggleButton>
-                      </ToggleButtonGroup>
-                    </Box>
-                    <Box sx={{ height: 380, width: '100%', minHeight: 380 }}>
-                      <ResponsiveContainer>
-                        {chartView === 'bar' ? (
-                          <BarChart data={barChartData} margin={{ top: 5, right: 20, left: 10, bottom: 70 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
-                            <YAxis tickFormatter={(val) => `₹${val / 1000}k`} tick={{ fontSize: 11, fill: '#64748b' }} />
-                            <RechartsTooltip content={<CustomBarTooltip formatCurrency={formatCurrency} />} />
-                            <Legend wrapperStyle={{ paddingTop: 16, fontSize: 13 }} />
-                            <Bar dataKey="Revenue" fill="#8b5cf6" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                              {barChartData.map((_, i) => (
-                                <Cell key={i} fill={GRADIENT_COLORS[i % GRADIENT_COLORS.length]} />
-                              ))}
-                            </Bar>
-                            <Bar dataKey="Discount" fill="#fbbf24" radius={[6, 6, 0, 0]} maxBarSize={40} />
-                          </BarChart>
-                        ) : (
-                          <PieChart>
-                            <Pie data={pieChartData} cx="50%" cy="50%" outerRadius={110} innerRadius={55} paddingAngle={3} dataKey="value">
-                              {pieChartData.map((_, i) => (
-                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                              ))}
-                            </Pie>
-                            <RechartsTooltip formatter={(val) => formatCurrency(val)} />
-                            <Legend wrapperStyle={{ fontSize: 12 }} />
-                          </PieChart>
-                        )}
-                      </ResponsiveContainer>
-                    </Box>
-                  </Paper>
-                </Grid>
+          {/* Charts Section */}
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            {/* Bar Chart — Top 10 Products by Revenue */}
+            <Grid item xs={12} lg={8}>
+              <ChartCard
+                title="Top 10 Products — Revenue vs Discount"
+                subtitle="Comparing revenue earned vs discount given per product"
+                height={400}
+                actions={
+                  <ToggleButtonGroup size="small" value={chartView} exclusive onChange={(e, v) => v && setChartView(v)} sx={{ '& .MuiToggleButton-root': { borderRadius: '8px', border: `1px solid ${tokens.tableBorder}`, px: 1.5 } }}>
+                    <ToggleButton value="bar"><BarChartIcon fontSize="small" /></ToggleButton>
+                    <ToggleButton value="pie"><PieChartIcon fontSize="small" /></ToggleButton>
+                  </ToggleButtonGroup>
+                }
+              >
+                <ResponsiveContainer>
+                  {chartView === 'bar' ? (
+                    <BarChart data={barChartData} margin={{ top: 5, right: 20, left: 10, bottom: 80 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={tokens.chartGrid} />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: tokens.chartAxisText }} angle={-35} textAnchor="end" interval={0} />
+                      <YAxis tickFormatter={(val) => `₹${val / 1000}k`} tick={{ fontSize: 11, fill: tokens.chartAxisText }} width={65} />
+                      <RechartsTooltip content={<CustomBarTooltip formatCurrency={formatCurrency} />} />
+                      <Legend wrapperStyle={{ paddingTop: 16, fontSize: 13 }} />
+                      <Bar dataKey="Revenue" fill={tokens.chartViolet} radius={[6, 6, 0, 0]} maxBarSize={40}>
+                        {barChartData.map((_, i) => (
+                          <Cell key={i} fill={GRADIENT_COLORS[i % GRADIENT_COLORS.length]} />
+                        ))}
+                      </Bar>
+                      <Bar dataKey="Discount" fill="#fbbf24" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                    </BarChart>
+                  ) : (
+                    <PieChart>
+                      <Pie data={pieChartData} cx="50%" cy="50%" outerRadius={110} innerRadius={55} paddingAngle={3} dataKey="value">
+                        {pieChartData.map((_, i) => (
+                          <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip formatter={(val) => formatCurrency(val)} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                    </PieChart>
+                  )}
+                </ResponsiveContainer>
+              </ChartCard>
+            </Grid>
 
-                {/* Top 3 Product Podium */}
-                <Grid item xs={12} lg={4}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                      <EmojiEventsIcon sx={{ color: '#f59e0b', fontSize: 22 }} />
-                      <Typography variant="subtitle1" fontWeight="bold" color="#1e293b">Top Performers</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {(data?.products || []).slice(0, 5).map((product, index) => {
-                        const pct = maxRevenue > 0 ? (parseFloat(product.total_revenue) / maxRevenue) * 100 : 0;
-                        const badge = getRankBadge(index);
-                        return (
-                          <Box key={index}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Chip label={badge.label} size="small" sx={{ bgcolor: `${badge.color}20`, color: badge.color, fontWeight: 'bold', fontSize: '11px', height: 22 }} />
-                                <Typography variant="body2" fontWeight="medium" color="#1e293b" noWrap sx={{ maxWidth: 130 }}>
-                                  {product.product_name}
-                                </Typography>
-                              </Box>
-                              <Typography variant="caption" fontWeight="bold" color="#8b5cf6">
-                                {formatCurrency(product.total_revenue)}
-                              </Typography>
-                            </Box>
-                            <LinearProgress
-                              variant="determinate"
-                              value={pct}
-                              sx={{
-                                height: 6, borderRadius: 3,
-                                bgcolor: '#f1f5f9',
-                                '& .MuiLinearProgress-bar': { borderRadius: 3, background: `linear-gradient(90deg, #8b5cf6, #667eea)` },
-                              }}
-                            />
+            {/* Top 3 Product Podium */}
+            <Grid item xs={12} lg={4}>
+              <Paper elevation={0} sx={{ p: { xs: 2, sm: 3 }, borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, height: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                  <EmojiEventsIcon sx={{ color: tokens.chartAmber, fontSize: 22 }} />
+                  <Typography variant="subtitle1" fontWeight="bold" color={tokens.textPrimary}>Top Performers</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {(data?.products || []).slice(0, 5).map((product, index) => {
+                    const pct = maxRevenue > 0 ? (parseFloat(product.total_revenue) / maxRevenue) * 100 : 0;
+                    const badge = getRankBadge(index);
+                    return (
+                      <Box key={index}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                            <Chip label={badge.label} size="small" sx={{ bgcolor: `${badge.color}20`, color: badge.color, fontWeight: 'bold', fontSize: '11px', height: 22, flexShrink: 0 }} />
+                            <Typography variant="body2" fontWeight="medium" color={tokens.textPrimary} noWrap sx={{ maxWidth: { xs: 100, lg: 130 } }}>
+                              {product.product_name}
+                            </Typography>
                           </Box>
-                        );
-                      })}
-                    </Box>
-                    <Divider sx={{ my: 2 }} />
-                    {/* Qty vs Revenue mini summary */}
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-                      <Box sx={{ p: 1.5, borderRadius: '10px', bgcolor: '#8b5cf615', textAlign: 'center' }}>
-                        <Typography variant="h6" fontWeight="bold" color="#8b5cf6">
-                          {data.summary.unique_products}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">SKUs</Typography>
+                          <Typography variant="caption" fontWeight="bold" color={tokens.chartViolet} sx={{ flexShrink: 0 }}>
+                            {formatCurrency(product.total_revenue)}
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={pct}
+                          sx={{
+                            height: 7, borderRadius: 4,
+                            bgcolor: tokens.surfaceHover,
+                            '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${tokens.chartViolet}, #667eea)` },
+                          }}
+                        />
                       </Box>
-                      <Box sx={{ p: 1.5, borderRadius: '10px', bgcolor: '#10b98115', textAlign: 'center' }}>
-                        <Typography variant="h6" fontWeight="bold" color="#10b981">
-                          {new Intl.NumberFormat('en-IN').format(data.summary.total_quantity_sold || 0)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">Units Sold</Typography>
-                      </Box>
-                    </Box>
-                  </Paper>
-                </Grid>
-              </Grid>
-
-              {/* Search + Table */}
-              <Paper elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TableChartIcon sx={{ color: '#8b5cf6', fontSize: 20 }} />
-                    <Typography variant="subtitle1" fontWeight="bold" color="#1e293b">
-                      Product Details
+                    );
+                  })}
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                {/* Qty vs Revenue mini summary */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                  <Box sx={{ p: 1.5, borderRadius: '10px', bgcolor: `${tokens.chartViolet}10`, textAlign: 'center' }}>
+                    <Typography variant="h6" fontWeight="bold" color={tokens.chartViolet}>
+                      {data.summary.unique_products}
                     </Typography>
-                    <Chip label={`${filteredProducts.length} products`} size="small" sx={{ bgcolor: '#8b5cf615', color: '#8b5cf6', fontWeight: 'bold' }} />
+                    <Typography variant="caption" color="text.secondary">SKUs</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f8fafc', px: 2, py: 0.75, borderRadius: '10px', border: '1px solid #e2e8f0', minWidth: 220 }}>
-                    <SearchIcon fontSize="small" sx={{ mr: 1, color: '#94a3b8' }} />
-                    <InputBase
-                      placeholder="Search products..."
-                      fullWidth
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      sx={{ fontSize: '13px' }}
-                    />
+                  <Box sx={{ p: 1.5, borderRadius: '10px', bgcolor: `${tokens.chartGreen}10`, textAlign: 'center' }}>
+                    <Typography variant="h6" fontWeight="bold" color={tokens.chartGreen}>
+                      {new Intl.NumberFormat('en-IN').format(data.summary.total_quantity_sold || 0)}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Units Sold</Typography>
                   </Box>
                 </Box>
-                <TableContainer sx={{ overflowX: 'auto' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#334155', py: 1.5 }}>#</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Product</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Times Sold</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Qty Sold</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Revenue</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Avg Rate</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Discount</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#334155', minWidth: 160 }}>Revenue Share</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredProducts.map((product, index) => {
-                        const revenuePercent = maxRevenue > 0 ? (parseFloat(product.total_revenue) / maxRevenue) * 100 : 0;
-                        const badge = getRankBadge(index);
-                        return (
-                          <TableRow key={index} sx={{ '&:hover': { bgcolor: '#f8fafc' }, transition: 'background 0.2s', '&:last-child td': { border: 0 } }}>
-                            <TableCell>
-                              <Chip
-                                label={badge.label}
-                                size="small"
-                                sx={{ bgcolor: index < 3 ? `${badge.color}20` : '#f1f5f9', color: index < 3 ? badge.color : '#64748b', fontWeight: 'bold', fontSize: '11px' }}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Avatar sx={{ width: 30, height: 30, fontSize: 12, bgcolor: `${PIE_COLORS[index % PIE_COLORS.length]}20`, color: PIE_COLORS[index % PIE_COLORS.length] }}>
-                                  {product.product_name?.charAt(0) || '?'}
-                                </Avatar>
-                                <Typography variant="body2" fontWeight="medium" color="#1e293b">{product.product_name || 'N/A'}</Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell align="right">
-                              <Chip label={product.times_sold} size="small" variant="outlined" sx={{ borderRadius: '6px', fontSize: '12px' }} />
-                            </TableCell>
-                            <TableCell align="right">
-                              <Typography variant="body2" fontWeight="medium">{new Intl.NumberFormat('en-IN').format(product.total_quantity || 0)}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                              <Typography variant="body2" fontWeight="bold" color="#059669">{formatCurrency(product.total_revenue)}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                              <Typography variant="body2" color="#475569">{formatCurrency(product.avg_rate)}</Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                              <Typography variant="body2" color="#f59e0b" fontWeight="medium">{formatCurrency(product.total_discount)}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={revenuePercent}
-                                  sx={{
-                                    flexGrow: 1, height: 7, borderRadius: 4,
-                                    bgcolor: '#f1f5f9',
-                                    '& .MuiLinearProgress-bar': { borderRadius: 4, background: 'linear-gradient(90deg, #8b5cf6, #667eea)' },
-                                  }}
-                                />
-                                <Typography variant="caption" color="#8b5cf6" fontWeight="bold" sx={{ minWidth: 34, textAlign: 'right' }}>
-                                  {revenuePercent.toFixed(0)}%
-                                </Typography>
-                              </Box>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                      {filteredProducts.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                              <InventoryIcon sx={{ fontSize: 40, color: '#cbd5e1' }} />
-                              <Typography color="text.secondary">No product data found</Typography>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
               </Paper>
-            </>
-          ) : null}
+            </Grid>
+          </Grid>
+
+          {/* Search + Table */}
+          <Paper elevation={0} sx={{ borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, overflow: 'hidden' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 }, display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1.5, sm: 2 }, borderBottom: `1px solid ${tokens.surfaceHover}` }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <TableChartIcon sx={{ color: tokens.chartViolet, fontSize: 20 }} />
+                <Typography variant="subtitle1" fontWeight="bold" color={tokens.textPrimary}>
+                  Product Details
+                </Typography>
+                <Chip label={`${filteredProducts.length} products`} size="small" sx={{ bgcolor: `${tokens.chartViolet}12`, color: tokens.chartViolet, fontWeight: 'bold' }} />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: tokens.surfaceSubtle, px: 2, py: 0.75, borderRadius: '10px', border: `1px solid ${tokens.tableBorder}`, width: { xs: '100%', sm: 'auto' }, minWidth: { sm: 220 } }}>
+                <SearchIcon fontSize="small" sx={{ mr: 1, color: tokens.textSecondary }} />
+                <InputBase
+                  placeholder="Search products..."
+                  fullWidth
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  sx={{ fontSize: '13px' }}
+                />
+              </Box>
+            </Box>
+            <TableContainer sx={{ overflowX: 'auto' }}>
+              <Table sx={{ minWidth: 850 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell>Product</TableCell>
+                    <TableCell align="right">Times Sold</TableCell>
+                    <TableCell align="right">Qty Sold</TableCell>
+                    <TableCell align="right">Revenue</TableCell>
+                    <TableCell align="right">Avg Rate</TableCell>
+                    <TableCell align="right">Discount</TableCell>
+                    <TableCell sx={{ minWidth: 160 }}>Revenue Share</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredProducts.map((product, index) => {
+                    const revenuePercent = maxRevenue > 0 ? (parseFloat(product.total_revenue) / maxRevenue) * 100 : 0;
+                    const badge = getRankBadge(index);
+                    return (
+                      <TableRow key={index} sx={{ '&:hover': { bgcolor: tokens.tableRowHover }, transition: 'background 0.2s', '&:last-child td': { border: 0 } }}>
+                        <TableCell>
+                          <Chip
+                            label={badge.label}
+                            size="small"
+                            sx={{ bgcolor: index < 3 ? `${badge.color}20` : tokens.surfaceHover, color: index < 3 ? badge.color : tokens.textSecondary, fontWeight: 'bold', fontSize: '11px' }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Avatar sx={{ width: 30, height: 30, fontSize: 12, bgcolor: `${CHART_PALETTE[index % CHART_PALETTE.length]}20`, color: CHART_PALETTE[index % CHART_PALETTE.length] }}>
+                              {product.product_name?.charAt(0) || '?'}
+                            </Avatar>
+                            <Typography variant="body2" fontWeight="medium" color={tokens.textPrimary}>{product.product_name || 'N/A'}</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Chip label={product.times_sold} size="small" variant="outlined" sx={{ borderRadius: '6px', fontSize: '12px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight="medium">{new Intl.NumberFormat('en-IN').format(product.total_quantity || 0)}</Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight="bold" color="#059669">{formatCurrency(product.total_revenue)}</Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" color={tokens.textSecondary}>{formatCurrency(product.avg_rate)}</Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" color={tokens.chartAmber} fontWeight="medium">{formatCurrency(product.total_discount)}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={revenuePercent}
+                              sx={{
+                                flexGrow: 1, height: 8, borderRadius: 4,
+                                bgcolor: tokens.surfaceHover,
+                                '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${tokens.chartViolet}, #667eea)` },
+                              }}
+                            />
+                            <Typography variant="caption" color={tokens.chartViolet} fontWeight="bold" sx={{ minWidth: 34, textAlign: 'right' }}>
+                              {revenuePercent.toFixed(0)}%
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {filteredProducts.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                          <InventoryIcon sx={{ fontSize: 40, color: tokens.textSecondary, opacity: 0.4 }} />
+                          <Typography color="text.secondary">No product data found</Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </>
+      ) : null}
     </AppLayout>
   );
 };

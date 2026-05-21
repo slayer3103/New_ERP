@@ -3,10 +3,14 @@ import { useParams } from 'react-router-dom';
 import {
   Box, Typography, Paper, CircularProgress, Alert,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
+  Divider,
 } from '@mui/material';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import axios from 'axios';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
 import BASE_URL from '../config/api';
+import { tokens } from '../theme/paletteTokens';
 
 const API = `${BASE_URL}`;
 
@@ -15,6 +19,7 @@ const API = `${BASE_URL}`;
 const REPORTS = {
   'sales-by-customers': {
     title: 'Sales By Customers',
+    gradient: [tokens.chartBlue, '#1D4ED8'],
     fetch: () => axios.get(`${API}/invoice`).then(r => r.data),
     build: (invoices) => {
       const map = new Map();
@@ -40,6 +45,7 @@ const REPORTS = {
 
   'sales-by-products': {
     title: 'Sales By Products',
+    gradient: ['#667EEA', '#764BA2'],
     fetch: () => axios.get(`${API}/invoice`).then(r => r.data),
     build: (invoices) => {
       const map = new Map();
@@ -66,6 +72,7 @@ const REPORTS = {
 
   'gst-summary': {
     title: 'GST Summary',
+    gradient: ['#0F766E', '#115E59'],
     fetch: () => axios.get(`${API}/invoice`).then(r => r.data),
     build: (invoices) => {
       let taxable = 0, tax = 0, total = 0, count = 0;
@@ -89,6 +96,7 @@ const REPORTS = {
 
   'tax-liability': {
     title: 'Tax Liability Report',
+    gradient: ['#1E293B', '#4338CA'],
     fetch: () => Promise.all([
       axios.get(`${API}/taxes`).then(r => r.data),
       axios.get(`${API}/invoice`).then(r => r.data),
@@ -110,6 +118,7 @@ const REPORTS = {
 
   'outstanding-invoices': {
     title: 'Outstanding Invoices',
+    gradient: ['#78350F', '#92400E'],
     fetch: () => axios.get(`${API}/invoice`).then(r => r.data),
     build: (invoices) => {
       const open = (invoices || []).filter(i => {
@@ -131,6 +140,7 @@ const REPORTS = {
 
   'payment-receipts': {
     title: 'Payment Receipts',
+    gradient: [tokens.chartGreen, '#059669'],
     fetch: () => axios.get(`${API}/payment-entries`).then(r => r.data),
     build: (payments) => ({
       columns: ['Receipt #', 'Invoice', 'Date', 'Amount', 'Mode'],
@@ -146,6 +156,7 @@ const REPORTS = {
 
   'po-summaries': {
     title: 'Purchase Order Summaries',
+    gradient: [tokens.chartBlue, '#1D4ED8'],
     fetch: () => axios.get(`${API}/purchase`).then(r => r.data),
     build: (orders) => ({
       columns: ['PO #', 'Vendor', 'Date', 'Amount', 'Status'],
@@ -161,6 +172,7 @@ const REPORTS = {
 
   'vendor-spend': {
     title: 'Vendor Spend Analysis',
+    gradient: ['#7C3AED', '#4F46E5'],
     fetch: () => axios.get(`${API}/purchase`).then(r => r.data),
     build: (orders) => {
       const map = new Map();
@@ -206,45 +218,64 @@ const ReportView = () => {
   }, [reportKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const view = useMemo(() => state.data, [state.data]);
+  const gradient = cfg?.gradient || tokens.gradientSlate;
 
   return (
     <AppLayout title="Report">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '12px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Typography variant="h6" fontWeight="bold">{cfg ? cfg.title : 'Unknown Report'}</Typography>
-              {view && <Chip label={`${view.rows.length} rows`} size="small" />}
-            </Box>
+      <ReportPageHeader
+        title={cfg ? cfg.title : 'Unknown Report'}
+        subtitle="Detailed tabular report view"
+        gradientStart={gradient[0]}
+        gradientEnd={gradient[1]}
+        icon={AssessmentIcon}
+      />
 
-            {state.loading && (
-              <Box sx={{ py: 8, textAlign: 'center' }}><CircularProgress /></Box>
-            )}
-            {state.error && (
-              <Alert severity="error" sx={{ borderRadius: 2 }}>{state.error}</Alert>
-            )}
-            {!state.loading && !state.error && view && view.rows.length === 0 && (
-              <Alert severity="info" sx={{ borderRadius: 2 }}>No data available for this report.</Alert>
-            )}
-            {!state.loading && !state.error && view && view.rows.length > 0 && (
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      {view.columns.map(c => (
-                        <TableCell key={c} sx={{ fontWeight: 'bold', bgcolor: '#f8fafc' }}>{c}</TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {view.rows.map((r, i) => (
-                      <TableRow key={i} hover>
-                        {r.map((cell, j) => <TableCell key={j}>{cell}</TableCell>)}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </Paper>
+      <Paper elevation={0} sx={{ borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, overflow: 'hidden' }}>
+        <Box sx={{ p: { xs: 2, sm: 2.5 }, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h6" fontWeight="bold" color={tokens.textPrimary}>
+            {cfg ? cfg.title : 'Unknown Report'}
+          </Typography>
+          {view && <Chip label={`${view.rows.length} rows`} size="small" sx={{ bgcolor: `${tokens.chartBlue}12`, color: tokens.chartBlue, fontWeight: 'bold' }} />}
+        </Box>
+        <Divider />
+
+        {state.loading && (
+          <Box sx={{ py: 8, textAlign: 'center' }}>
+            <CircularProgress size={48} sx={{ color: tokens.primary }} />
+          </Box>
+        )}
+        {state.error && (
+          <Box sx={{ p: 3 }}>
+            <Alert severity="error" sx={{ borderRadius: 2 }}>{state.error}</Alert>
+          </Box>
+        )}
+        {!state.loading && !state.error && view && view.rows.length === 0 && (
+          <Box sx={{ p: 6, textAlign: 'center' }}>
+            <AssessmentIcon sx={{ fontSize: 48, color: tokens.textSecondary, mb: 1, opacity: 0.4 }} />
+            <Typography color="text.secondary">No data available for this report.</Typography>
+          </Box>
+        )}
+        {!state.loading && !state.error && view && view.rows.length > 0 && (
+          <TableContainer>
+            <Table sx={{ minWidth: 600 }}>
+              <TableHead>
+                <TableRow>
+                  {view.columns.map(c => (
+                    <TableCell key={c}>{c}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {view.rows.map((r, i) => (
+                  <TableRow key={i} sx={{ '&:hover': { bgcolor: tokens.tableRowHover }, transition: 'background 0.2s' }}>
+                    {r.map((cell, j) => <TableCell key={j}>{cell}</TableCell>)}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
     </AppLayout>
   );
 };

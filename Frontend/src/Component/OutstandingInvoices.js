@@ -3,8 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Card,
-  CardContent,
   CircularProgress,
   Alert,
   Table,
@@ -15,14 +13,18 @@ import {
   TableRow,
   Chip,
   Divider,
-  InputBase,
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
+import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
+import ReportSearchBar from '../components/common/ReportSearchBar';
 import axios from 'axios';
 import BASE_URL from '../config/api';
+import { tokens } from '../theme/paletteTokens';
 
 const OutstandingInvoices = () => {
   const [data, setData] = useState(null);
@@ -69,112 +71,90 @@ const OutstandingInvoices = () => {
     }
   };
 
-  const StatCard = ({ title, value, icon, color, subtitle }) => (
-    <Card
-      sx={{
-        height: '100%',
-        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-        border: `1px solid ${color}20`,
-        transition: 'all 0.3s ease',
-        '&:hover': { transform: 'translateY(-4px)', boxShadow: `0 8px 25px ${color}25` },
-      }}
-    >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ p: 1.5, borderRadius: '12px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </Box>
-        </Box>
-        <Typography variant="h4" fontWeight="bold" color={color} sx={{ mb: 1 }}>{value}</Typography>
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">{title}</Typography>
-        {subtitle && <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>{subtitle}</Typography>}
-      </CardContent>
-    </Card>
-  );
-
   return (
     <AppLayout title="Outstanding Invoices">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #78350f 0%, #92400e 100%)', color: 'white' }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>⚠️ Outstanding Invoices</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9, color: 'rgba(255,255,255,0.9)' }}>Track unpaid and partially paid invoices with aging analysis</Typography>
-          </Paper>
+      <ReportPageHeader
+        title="⚠️ Outstanding Invoices"
+        subtitle="Track unpaid and partially paid invoices with aging analysis"
+        gradientStart="#78350F"
+        gradientEnd="#92400E"
+        icon={WarningAmberIcon}
+      />
 
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: '#f59e0b' }} /></Box>
-          ) : error ? (
-            <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
-          ) : data ? (
-            <>
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 3, mb: 3 }}>
-                <StatCard title="Outstanding Count" value={data.summary.total_outstanding} icon={<ReceiptIcon sx={{ fontSize: 28, color: '#f59e0b' }} />} color="#f59e0b" subtitle="Unpaid invoices" />
-                <StatCard title="Balance Due" value={formatCurrency(data.summary.total_balance_due)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#dc2626' }} />} color="#dc2626" subtitle="Total pending" />
-                <StatCard title="Invoice Value" value={formatCurrency(data.summary.total_invoice_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#3b82f6' }} />} color="#3b82f6" subtitle="Total value" />
-                <StatCard title="Overdue" value={data.summary.overdue_count} icon={<AccessTimeIcon sx={{ fontSize: 28, color: '#7c3aed' }} />} color="#7c3aed" subtitle={`Avg ${Math.round(data.summary.avg_days_outstanding || 0)} days`} />
-              </Box>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: tokens.chartAmber }} /></Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
+      ) : data ? (
+        <>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: 3 }}>
+            <AnalyticsStatCard title="Outstanding Count" value={data.summary.total_outstanding} icon={<ReceiptIcon sx={{ fontSize: 28, color: tokens.chartAmber }} />} color={tokens.chartAmber} subtitle="Unpaid invoices" />
+            <AnalyticsStatCard title="Balance Due" value={formatCurrency(data.summary.total_balance_due)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartRose }} />} color={tokens.chartRose} subtitle="Total pending" />
+            <AnalyticsStatCard title="Invoice Value" value={formatCurrency(data.summary.total_invoice_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartBlue }} />} color={tokens.chartBlue} subtitle="Total value" />
+            <AnalyticsStatCard title="Overdue" value={data.summary.overdue_count} icon={<AccessTimeIcon sx={{ fontSize: 28, color: tokens.chartViolet }} />} color={tokens.chartViolet} subtitle={`Avg ${Math.round(data.summary.avg_days_outstanding || 0)} days`} />
+          </Box>
 
-              <Paper elevation={0} sx={{ p: 2, borderRadius: '12px', mb: 3, border: '1px solid #e2e8f0' }}>
-                <InputBase
-                  placeholder="Search by customer or invoice number..."
-                  fullWidth
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{ bgcolor: '#f8f8f8', borderRadius: '10px', px: 2, py: 1, border: '1px solid #e0e0e0' }}
-                />
-              </Paper>
+          <Box sx={{ mb: 3 }}>
+            <ReportSearchBar
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by customer or invoice number..."
+            />
+          </Box>
 
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="h6" fontWeight="bold" color="#1e293b">Outstanding Invoice Details</Typography>
-                </Box>
-                <Divider />
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Invoice #</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Customer</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Invoice Date</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Due Date</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Total</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Paid</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Balance Due</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 'bold', color: '#334155' }}>Days</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 'bold', color: '#334155' }}>Aging</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 'bold', color: '#334155' }}>Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredInvoices.map((inv, idx) => (
-                      <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f1f5f9' }, transition: 'background 0.2s' }}>
-                        <TableCell><Typography fontWeight="medium">{inv.invoice_number}</Typography></TableCell>
-                        <TableCell>{inv.customer_name}</TableCell>
-                        <TableCell>{formatDate(inv.invoice_date)}</TableCell>
-                        <TableCell>{formatDate(inv.expiry_date)}</TableCell>
-                        <TableCell align="right">{formatCurrency(inv.grand_total)}</TableCell>
-                        <TableCell align="right" sx={{ color: '#10b981' }}>{formatCurrency(inv.total_paid)}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#dc2626' }}>{formatCurrency(inv.balance_due)}</TableCell>
-                        <TableCell align="center">{inv.days_since_invoice}</TableCell>
-                        <TableCell align="center">
-                          <Chip label={inv.aging_category} size="small" color={getAgingColor(inv.aging_category)} variant="outlined" sx={{ borderRadius: '8px' }} />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            label={inv.status}
-                            size="small"
-                            color={inv.status === 'Partial' ? 'warning' : 'default'}
-                            variant="outlined"
-                            sx={{ borderRadius: '8px' }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {filteredInvoices.length === 0 && (
-                      <TableRow><TableCell colSpan={10} align="center" sx={{ py: 4, color: '#94a3b8' }}>No outstanding invoices found — great job!</TableCell></TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          ) : null}
+          <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, overflowX: 'auto' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Typography variant="h6" fontWeight="bold" color={tokens.textPrimary}>Outstanding Invoice Details</Typography>
+            </Box>
+            <Divider />
+            <Table sx={{ minWidth: 1000 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Invoice #</TableCell>
+                  <TableCell>Customer</TableCell>
+                  <TableCell>Invoice Date</TableCell>
+                  <TableCell>Due Date</TableCell>
+                  <TableCell align="right">Total</TableCell>
+                  <TableCell align="right">Paid</TableCell>
+                  <TableCell align="right">Balance Due</TableCell>
+                  <TableCell align="center">Days</TableCell>
+                  <TableCell align="center">Aging</TableCell>
+                  <TableCell align="center">Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredInvoices.map((inv, idx) => (
+                  <TableRow key={idx} sx={{ '&:hover': { bgcolor: tokens.tableRowHover }, transition: 'background 0.2s' }}>
+                    <TableCell><Typography fontWeight="medium">{inv.invoice_number}</Typography></TableCell>
+                    <TableCell>{inv.customer_name}</TableCell>
+                    <TableCell>{formatDate(inv.invoice_date)}</TableCell>
+                    <TableCell>{formatDate(inv.expiry_date)}</TableCell>
+                    <TableCell align="right">{formatCurrency(inv.grand_total)}</TableCell>
+                    <TableCell align="right" sx={{ color: tokens.chartGreen }}>{formatCurrency(inv.total_paid)}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', color: tokens.chartRose }}>{formatCurrency(inv.balance_due)}</TableCell>
+                    <TableCell align="center">{inv.days_since_invoice}</TableCell>
+                    <TableCell align="center">
+                      <Chip label={inv.aging_category} size="small" color={getAgingColor(inv.aging_category)} variant="outlined" sx={{ borderRadius: '8px' }} />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={inv.status}
+                        size="small"
+                        color={inv.status === 'Partial' ? 'warning' : 'default'}
+                        variant="outlined"
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredInvoices.length === 0 && (
+                  <TableRow><TableCell colSpan={10} align="center" sx={{ py: 4, color: tokens.textSecondary }}>No outstanding invoices found — great job!</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      ) : null}
     </AppLayout>
   );
 };

@@ -19,6 +19,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
 import SearchField from '../components/common/SearchField';
 import { tokens } from '../theme/paletteTokens';
 
@@ -59,6 +60,18 @@ const getReportIcon = (reportName) => {
   }
 };
 
+const REPORT_DESCRIPTIONS = {
+  'Sales By Customers': 'Revenue breakdown and payment status per customer.',
+  'Sales By Products': 'Product performance, quantity trends, and revenue contribution.',
+  'Sales By Time Period': 'Periodic sales dashboard with trend analysis.',
+  'GST Summery': 'Monthly CGST, SGST, and IGST tax breakdown.',
+  'Tax Liability Reports': 'Track collected vs pending tax liability.',
+  'Outstanding Invoices': 'Unpaid invoices with aging analysis.',
+  'Payment Receipts': 'Complete payment log with mode-wise breakdown.',
+  'PO Summaries': 'Purchase order overview with vendor spending.',
+  'Vendor Spend Analysis': 'Procurement spending analysis across vendors.',
+};
+
 const ReportsAndAnalytics = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -67,25 +80,25 @@ const ReportsAndAnalytics = () => {
     {
       title: 'Sales Report',
       desc: 'Analyze your sales performance over time',
-      color: tokens.primary,
+      color: tokens.chartBlue,
       reports: ['Sales By Customers', 'Sales By Products', 'Sales By Time Period'],
     },
     {
       title: 'Tax Report',
       desc: 'Keep track of your tax liabilities and GST',
-      color: tokens.success,
+      color: tokens.chartGreen,
       reports: ['GST Summery', 'Tax Liability Reports'],
     },
     {
       title: 'Payment Report',
       desc: 'Monitor incoming payments and outstanding invoices',
-      color: '#8b5cf6',
+      color: tokens.chartViolet,
       reports: ['Outstanding Invoices', 'Payment Receipts'],
     },
     {
       title: 'Purchase Report',
       desc: 'Track vendor spending and purchase orders',
-      color: tokens.warning,
+      color: tokens.chartAmber,
       reports: ['PO Summaries', 'Vendor Spend Analysis'],
     },
   ];
@@ -108,23 +121,10 @@ const ReportsAndAnalytics = () => {
 
   return (
     <AppLayout title="Reports & Analytics">
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 2,
-          bgcolor: tokens.sidebarBg,
-          color: '#fff',
-        }}
-      >
-        <Typography variant="h5" fontWeight={700} mb={1}>
-          Analytics & Reports
-        </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.85, maxWidth: 560 }}>
-          Access business data in one place. Track performance and make data-driven decisions.
-        </Typography>
-      </Paper>
+      <ReportPageHeader
+        title="📊 Analytics & Reports"
+        subtitle="Access business data in one place. Track performance and make data-driven decisions."
+      />
 
       <Box sx={{ mb: 3, maxWidth: 480 }}>
         <SearchField
@@ -138,13 +138,24 @@ const ReportsAndAnalytics = () => {
 
       {filteredSections.map((section) => (
         <Box key={section.title} sx={{ mb: 4 }}>
-          <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
-            {section.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+            <Box
+              sx={{
+                width: 4,
+                height: 24,
+                borderRadius: 2,
+                bgcolor: section.color,
+                flexShrink: 0,
+              }}
+            />
+            <Typography variant="h6" fontWeight={700}>
+              {section.title}
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2, pl: '20px' }}>
             {section.desc}
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={2.5}>
             {section.reports.map((report) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={report}>
                 <Card
@@ -154,15 +165,15 @@ const ReportsAndAnalytics = () => {
                     height: '100%',
                     cursor: 'pointer',
                     border: `1px solid ${tokens.border}`,
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                       borderColor: section.color,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                      transform: 'translateY(-2px)',
+                      boxShadow: `0 8px 24px -4px ${section.color}20`,
+                      transform: 'translateY(-3px)',
                     },
                   }}
                 >
-                  <CardContent>
+                  <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
                     <Box
                       sx={{
                         display: 'flex',
@@ -172,22 +183,29 @@ const ReportsAndAnalytics = () => {
                     >
                       <Box
                         sx={{
-                          p: 1,
-                          borderRadius: 2,
-                          bgcolor: `${section.color}14`,
+                          p: 1.25,
+                          borderRadius: '12px',
+                          bgcolor: `${section.color}10`,
                           color: section.color,
                           display: 'flex',
                         }}
                       >
                         {getReportIcon(report)}
                       </Box>
-                      <ArrowForwardIosIcon sx={{ fontSize: 14, color: tokens.textSecondary }} />
+                      <ArrowForwardIosIcon
+                        sx={{
+                          fontSize: 14,
+                          color: tokens.textSecondary,
+                          transition: 'transform 0.2s ease',
+                          '.MuiCard-root:hover &': { transform: 'translateX(3px)' },
+                        }}
+                      />
                     </Box>
                     <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 2 }}>
                       {report}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      View detailed analytics for {report.toLowerCase()}.
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                      {REPORT_DESCRIPTIONS[report] || `View detailed analytics for ${report.toLowerCase()}.`}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -204,10 +222,15 @@ const ReportsAndAnalytics = () => {
             p: 6,
             textAlign: 'center',
             border: `1px dashed ${tokens.border}`,
+            borderRadius: '16px',
           }}
         >
-          <Typography color="text.secondary">
+          <AnalyticsIcon sx={{ fontSize: 48, color: tokens.textSecondary, mb: 1, opacity: 0.5 }} />
+          <Typography color="text.secondary" fontWeight="medium">
             No reports found matching &quot;{searchTerm}&quot;
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            Try a different search term.
           </Typography>
         </Paper>
       )}

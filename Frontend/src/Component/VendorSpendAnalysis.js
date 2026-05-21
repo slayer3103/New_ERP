@@ -3,10 +3,7 @@ import {
   Box,
   Typography,
   Paper,
-  Card,
-  CardContent,
   Avatar,
-  InputBase,
   CircularProgress,
   Alert,
   Table,
@@ -23,8 +20,12 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
+import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
+import ReportSearchBar from '../components/common/ReportSearchBar';
 import axios from 'axios';
 import BASE_URL from '../config/api';
+import { tokens } from '../theme/paletteTokens';
 
 const VendorSpendAnalysis = () => {
   const [data, setData] = useState(null);
@@ -62,130 +63,108 @@ const VendorSpendAnalysis = () => {
 
   const maxSpend = Math.max(...(data?.vendors?.map(v => parseFloat(v.total_spent) || 0) || [1]));
 
-  const StatCard = ({ title, value, icon, color, subtitle }) => (
-    <Card
-      sx={{
-        height: '100%',
-        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-        border: `1px solid ${color}20`,
-        transition: 'all 0.3s ease',
-        '&:hover': { transform: 'translateY(-4px)', boxShadow: `0 8px 25px ${color}25` },
-      }}
-    >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ p: 1.5, borderRadius: '12px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </Box>
-        </Box>
-        <Typography variant="h4" fontWeight="bold" color={color} sx={{ mb: 1 }}>{value}</Typography>
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">{title}</Typography>
-        {subtitle && <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>{subtitle}</Typography>}
-      </CardContent>
-    </Card>
-  );
-
   return (
     <AppLayout title="Vendor Spend Analysis">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', color: 'white' }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>🏢 Vendor Spend Analysis</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>Analyze procurement spending across vendors</Typography>
-          </Paper>
+      <ReportPageHeader
+        title="🏢 Vendor Spend Analysis"
+        subtitle="Analyze procurement spending across vendors"
+        gradientStart="#7C3AED"
+        gradientEnd="#4F46E5"
+        icon={BusinessIcon}
+      />
 
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: '#7c3aed' }} /></Box>
-          ) : error ? (
-            <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
-          ) : data ? (
-            <>
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 3, mb: 3 }}>
-                <StatCard title="Total Vendors" value={data.summary.total_vendors} icon={<BusinessIcon sx={{ fontSize: 28, color: '#7c3aed' }} />} color="#7c3aed" subtitle="Active vendors" />
-                <StatCard title="Total Spent" value={formatCurrency(data.summary.total_procurement_spend)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#dc2626' }} />} color="#dc2626" subtitle="Total procurement" />
-                <StatCard title="Total Orders" value={data.summary.total_orders} icon={<ShoppingCartIcon sx={{ fontSize: 28, color: '#3b82f6' }} />} color="#3b82f6" subtitle="Purchase orders" />
-                <StatCard title="Avg Order Value" value={formatCurrency(data.summary.avg_order_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#10b981' }} />} color="#10b981" subtitle="Per order" />
-              </Box>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: tokens.chartViolet }} /></Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
+      ) : data ? (
+        <>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: 3 }}>
+            <AnalyticsStatCard title="Total Vendors" value={data.summary.total_vendors} icon={<BusinessIcon sx={{ fontSize: 28, color: tokens.chartViolet }} />} color={tokens.chartViolet} subtitle="Active vendors" />
+            <AnalyticsStatCard title="Total Spent" value={formatCurrency(data.summary.total_procurement_spend)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartRose }} />} color={tokens.chartRose} subtitle="Total procurement" />
+            <AnalyticsStatCard title="Total Orders" value={data.summary.total_orders} icon={<ShoppingCartIcon sx={{ fontSize: 28, color: tokens.chartBlue }} />} color={tokens.chartBlue} subtitle="Purchase orders" />
+            <AnalyticsStatCard title="Avg Order Value" value={formatCurrency(data.summary.avg_order_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartGreen }} />} color={tokens.chartGreen} subtitle="Per order" />
+          </Box>
 
-              <Paper elevation={0} sx={{ p: 2, borderRadius: '12px', mb: 3, border: '1px solid #e2e8f0' }}>
-                <InputBase
-                  placeholder="Search vendors..."
-                  fullWidth
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{ bgcolor: '#f8f8f8', borderRadius: '10px', px: 2, py: 1, border: '1px solid #e0e0e0' }}
-                />
-              </Paper>
+          <Box sx={{ mb: 3 }}>
+            <ReportSearchBar
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search vendors..."
+            />
+          </Box>
 
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="h6" fontWeight="bold" color="#1e293b">Vendor Spend Breakdown</Typography>
-                </Box>
-                <Divider />
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>#</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Vendor</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Orders</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Items</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Total Spent</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Avg Order</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Tax Paid</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>First / Last Order</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155', minWidth: 140 }}>Spend Share</TableCell>
+          <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, overflowX: 'auto' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Typography variant="h6" fontWeight="bold" color={tokens.textPrimary}>Vendor Spend Breakdown</Typography>
+            </Box>
+            <Divider />
+            <Table sx={{ minWidth: 950 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Vendor</TableCell>
+                  <TableCell align="right">Orders</TableCell>
+                  <TableCell align="right">Items</TableCell>
+                  <TableCell align="right">Total Spent</TableCell>
+                  <TableCell align="right">Avg Order</TableCell>
+                  <TableCell align="right">Tax Paid</TableCell>
+                  <TableCell>First / Last Order</TableCell>
+                  <TableCell sx={{ minWidth: 160 }}>Spend Share</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredVendors.map((vendor, idx) => {
+                  const spendPercent = maxSpend > 0 ? (parseFloat(vendor.total_spent) / maxSpend) * 100 : 0;
+                  return (
+                    <TableRow key={idx} sx={{ '&:hover': { bgcolor: tokens.tableRowHover }, transition: 'background 0.2s' }}>
+                      <TableCell>
+                        <Chip label={idx + 1} size="small" sx={{ bgcolor: idx < 3 ? tokens.chartViolet : tokens.surfaceHover, color: idx < 3 ? '#fff' : tokens.textPrimary, fontWeight: 'bold', borderRadius: '8px' }} />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Avatar sx={{ bgcolor: tokens.chartViolet, width: 36, height: 36, fontSize: 14 }}>
+                            {vendor.vendor_name?.charAt(0) || '?'}
+                          </Avatar>
+                          <Typography fontWeight="medium">{vendor.vendor_name}</Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">{vendor.total_orders}</TableCell>
+                      <TableCell align="right">{new Intl.NumberFormat('en-IN').format(vendor.total_items_ordered || 0)}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#059669' }}>{formatCurrency(vendor.total_spent)}</TableCell>
+                      <TableCell align="right">{formatCurrency(vendor.avg_order_value)}</TableCell>
+                      <TableCell align="right" sx={{ color: tokens.chartViolet }}>{formatCurrency(vendor.tax_paid)}</TableCell>
+                      <TableCell>
+                        <Typography variant="caption" display="block" color="text.secondary">{formatDate(vendor.first_order_date)}</Typography>
+                        <Typography variant="caption" display="block" color="text.primary" fontWeight="medium">{formatDate(vendor.last_order_date)}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={spendPercent}
+                            sx={{
+                              flexGrow: 1, height: 8, borderRadius: 4,
+                              bgcolor: tokens.surfaceHover,
+                              '& .MuiLinearProgress-bar': { borderRadius: 4, background: `linear-gradient(90deg, ${tokens.chartViolet}, #4F46E5)` },
+                            }}
+                          />
+                          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 35 }}>
+                            {spendPercent.toFixed(0)}%
+                          </Typography>
+                        </Box>
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredVendors.map((vendor, idx) => {
-                      const spendPercent = maxSpend > 0 ? (parseFloat(vendor.total_spent) / maxSpend) * 100 : 0;
-                      return (
-                        <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f1f5f9' }, transition: 'background 0.2s' }}>
-                          <TableCell>
-                            <Chip label={idx + 1} size="small" sx={{ bgcolor: idx < 3 ? '#7c3aed' : '#e2e8f0', color: idx < 3 ? '#fff' : '#334155', fontWeight: 'bold', borderRadius: '8px' }} />
-                          </TableCell>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Avatar sx={{ bgcolor: '#7c3aed', width: 36, height: 36, fontSize: 14 }}>
-                                {vendor.vendor_name?.charAt(0) || '?'}
-                              </Avatar>
-                              <Typography fontWeight="medium">{vendor.vendor_name}</Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">{vendor.total_orders}</TableCell>
-                          <TableCell align="right">{new Intl.NumberFormat('en-IN').format(vendor.total_items_ordered || 0)}</TableCell>
-                          <TableCell align="right" sx={{ fontWeight: 'bold', color: '#059669' }}>{formatCurrency(vendor.total_spent)}</TableCell>
-                          <TableCell align="right">{formatCurrency(vendor.avg_order_value)}</TableCell>
-                          <TableCell align="right" sx={{ color: '#8b5cf6' }}>{formatCurrency(vendor.tax_paid)}</TableCell>
-                          <TableCell>
-                            <Typography variant="caption" display="block" color="text.secondary">{formatDate(vendor.first_order_date)}</Typography>
-                            <Typography variant="caption" display="block" color="text.primary">{formatDate(vendor.last_order_date)}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <LinearProgress
-                                variant="determinate"
-                                value={spendPercent}
-                                sx={{
-                                  flexGrow: 1, height: 8, borderRadius: 4,
-                                  bgcolor: '#e2e8f0',
-                                  '& .MuiLinearProgress-bar': { borderRadius: 4, background: 'linear-gradient(90deg, #7c3aed, #4f46e5)' },
-                                }}
-                              />
-                              <Typography variant="caption" color="text.secondary" sx={{ minWidth: 35 }}>
-                                {spendPercent.toFixed(0)}%
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                    {filteredVendors.length === 0 && (
-                      <TableRow><TableCell colSpan={9} align="center" sx={{ py: 4, color: '#94a3b8' }}>No vendor data found</TableCell></TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          ) : null}
+                  );
+                })}
+                {filteredVendors.length === 0 && (
+                  <TableRow><TableCell colSpan={9} align="center" sx={{ py: 4, color: tokens.textSecondary }}>No vendor data found</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      ) : null}
     </AppLayout>
   );
 };

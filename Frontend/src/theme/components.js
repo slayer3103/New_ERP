@@ -42,6 +42,7 @@ const components = {
         borderRadius: 12,
         border: `1px solid ${tokens.border}`,
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
@@ -54,19 +55,30 @@ const components = {
       },
     },
   },
+  MuiTableContainer: {
+    styleOverrides: {
+      root: {
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      },
+    },
+  },
   MuiTableCell: {
     styleOverrides: {
       head: {
-        backgroundColor: tokens.mutedSurface,
-        color: tokens.textSecondary,
-        fontWeight: 600,
+        backgroundColor: tokens.tableHeaderBg,
+        color: tokens.tableHeaderText,
+        fontWeight: 700,
         fontSize: '0.75rem',
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
-        borderBottom: `1px solid ${tokens.border}`,
+        borderBottom: `2px solid ${tokens.tableBorder}`,
+        whiteSpace: 'nowrap',
+        padding: '14px 16px',
       },
       root: {
         borderBottom: `1px solid ${tokens.border}`,
+        padding: '12px 16px',
       },
     },
   },

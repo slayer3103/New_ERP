@@ -3,10 +3,7 @@ import {
   Box,
   Typography,
   Paper,
-  Card,
-  CardContent,
   Avatar,
-  InputBase,
   CircularProgress,
   Alert,
   Table,
@@ -23,8 +20,13 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BusinessIcon from '@mui/icons-material/Business';
 import AppLayout from '../layouts/AppLayout';
+import ReportPageHeader from '../components/common/ReportPageHeader';
+import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
+import ChartCard from '../components/common/ChartCard';
+import ReportSearchBar from '../components/common/ReportSearchBar';
 import axios from 'axios';
 import BASE_URL from '../config/api';
+import { tokens, CHART_PALETTE } from '../theme/paletteTokens';
 import {
   BarChart,
   Bar,
@@ -38,8 +40,6 @@ import {
   Pie,
   Cell
 } from 'recharts';
-
-const COLORS = ['#3b82f6', '#dc2626', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#14b8a6', '#6366f1'];
 
 const POSummaries = () => {
   const [data, setData] = useState(null);
@@ -76,29 +76,6 @@ const POSummaries = () => {
     o.purchase_order_no?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const StatCard = ({ title, value, icon, color, subtitle }) => (
-    <Card
-      sx={{
-        height: '100%',
-        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-        border: `1px solid ${color}20`,
-        transition: 'all 0.3s ease',
-        '&:hover': { transform: 'translateY(-4px)', boxShadow: `0 8px 25px ${color}25` },
-      }}
-    >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ p: 1.5, borderRadius: '12px', backgroundColor: `${color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </Box>
-        </Box>
-        <Typography variant="h4" fontWeight="bold" color={color} sx={{ mb: 1 }}>{value}</Typography>
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">{title}</Typography>
-        {subtitle && <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>{subtitle}</Typography>}
-      </CardContent>
-    </Card>
-  );
-
   let vendorData = [];
   if (data && data.orders) {
     const vendorMap = {};
@@ -115,135 +92,126 @@ const POSummaries = () => {
 
   return (
     <AppLayout title="PO Summaries">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: 'white' }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>📋 Purchase Order Summaries</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>Overview of all purchase orders with total spending and item details</Typography>
-          </Paper>
+      <ReportPageHeader
+        title="📋 Purchase Order Summaries"
+        subtitle="Overview of all purchase orders with total spending and item details"
+        gradientStart={tokens.chartBlue}
+        gradientEnd="#1D4ED8"
+        icon={ShoppingCartIcon}
+      />
 
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: '#3b82f6' }} /></Box>
-          ) : error ? (
-            <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
-          ) : data ? (
-            <>
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 3, mb: 3 }}>
-                <StatCard title="Total Orders" value={data.summary.total_orders} icon={<ShoppingCartIcon sx={{ fontSize: 28, color: '#3b82f6' }} />} color="#3b82f6" subtitle="Purchase orders" />
-                <StatCard title="Total Spent" value={formatCurrency(data.summary.total_spent)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#dc2626' }} />} color="#dc2626" subtitle="All POs" />
-                <StatCard title="Unique Vendors" value={data.summary.unique_vendors} icon={<BusinessIcon sx={{ fontSize: 28, color: '#8b5cf6' }} />} color="#8b5cf6" subtitle="Vendor count" />
-                <StatCard title="Avg Order Value" value={formatCurrency(data.summary.avg_order_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: '#10b981' }} />} color="#10b981" subtitle="Per order" />
-              </Box>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={60} sx={{ color: tokens.chartBlue }} /></Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ borderRadius: '12px' }}>{error}</Alert>
+      ) : data ? (
+        <>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: { xs: 2, md: 3 }, mb: 3 }}>
+            <AnalyticsStatCard title="Total Orders" value={data.summary.total_orders} icon={<ShoppingCartIcon sx={{ fontSize: 28, color: tokens.chartBlue }} />} color={tokens.chartBlue} subtitle="Purchase orders" />
+            <AnalyticsStatCard title="Total Spent" value={formatCurrency(data.summary.total_spent)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartRose }} />} color={tokens.chartRose} subtitle="All POs" />
+            <AnalyticsStatCard title="Unique Vendors" value={data.summary.unique_vendors} icon={<BusinessIcon sx={{ fontSize: 28, color: tokens.chartViolet }} />} color={tokens.chartViolet} subtitle="Vendor count" />
+            <AnalyticsStatCard title="Avg Order Value" value={formatCurrency(data.summary.avg_order_value)} icon={<AttachMoneyIcon sx={{ fontSize: 28, color: tokens.chartGreen }} />} color={tokens.chartGreen} subtitle="Per order" />
+          </Box>
 
-              <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={8}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
-                    <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
-                      Top 10 Vendors by Spending
-                    </Typography>
-                    <Box sx={{ height: 450, width: '100%', minHeight: 450 }}>
-                      <ResponsiveContainer>
-                        <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                          <XAxis type="number" tickFormatter={(val) => `₹${val/1000}k`} />
-                          <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 12 }} />
-                          <RechartsTooltip formatter={(value) => formatCurrency(value)} />
-                          <Legend />
-                          <Bar dataKey="total_spent" name="Spending" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </Box>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
-                      Orders by Vendor
-                    </Typography>
-                    <Box sx={{ height: 450, width: '100%', minHeight: 450 }}>
-                      <ResponsiveContainer>
-                        <PieChart>
-                          <Pie
-                            data={vendorData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="order_count"
-                            nameKey="name"
-                          >
-                            {vendorData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </Box>
-                  </Paper>
-                </Grid>
-              </Grid>
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            <Grid item xs={12} md={8}>
+              <ChartCard title="Top 10 Vendors by Spending" subtitle="Horizontal bar chart of vendor spend" height={450}>
+                <ResponsiveContainer>
+                  <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={tokens.chartGrid} />
+                    <XAxis type="number" tickFormatter={(val) => `₹${val/1000}k`} tick={{ fontSize: 11, fill: tokens.chartAxisText }} />
+                    <YAxis dataKey="name" type="category" width={180} tick={{ fontSize: 12, fill: tokens.chartAxisText }} />
+                    <RechartsTooltip formatter={(value) => formatCurrency(value)} />
+                    <Legend />
+                    <Bar dataKey="total_spent" name="Spending" fill={tokens.chartBlue} radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <ChartCard title="Orders by Vendor" subtitle="Donut chart of order distribution" height={450} isEmpty={vendorData.length === 0} emptyText="No vendor data">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={vendorData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="order_count"
+                      nameKey="name"
+                    >
+                      {vendorData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_PALETTE[index % CHART_PALETTE.length]} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </Grid>
+          </Grid>
 
-              <Paper elevation={0} sx={{ p: 2, borderRadius: '12px', mb: 3, border: '1px solid #e2e8f0' }}>
-                <InputBase
-                  placeholder="Search by vendor or PO number..."
-                  fullWidth
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{ bgcolor: '#f8f8f8', borderRadius: '10px', px: 2, py: 1, border: '1px solid #e0e0e0' }}
-                />
-              </Paper>
+          <Box sx={{ mb: 3 }}>
+            <ReportSearchBar
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by vendor or PO number..."
+            />
+          </Box>
 
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
-                <Box sx={{ p: 2 }}>
-                  <Typography variant="h6" fontWeight="bold" color="#1e293b">Purchase Order Details</Typography>
-                </Box>
-                <Divider />
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: '#f8fafc' }}>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>PO Number</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Vendor</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Order Date</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Delivery Date</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Items</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Sub Total</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Tax</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: '#334155' }}>Total</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredOrders.map((order, idx) => (
-                      <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f1f5f9' }, transition: 'background 0.2s' }}>
-                        <TableCell>
-                          <Typography fontWeight="medium" color="#3b82f6">{order.purchase_order_no}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Avatar sx={{ bgcolor: '#3b82f6', width: 30, height: 30, fontSize: 12 }}>
-                              {order.vendor_name?.charAt(0) || '?'}
-                            </Avatar>
-                            <Typography>{order.vendor_name}</Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>{formatDate(order.purchase_order_date)}</TableCell>
-                        <TableCell>{formatDate(order.delivery_date)}</TableCell>
-                        <TableCell align="right">
-                          <Chip label={`${order.item_count} items`} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
-                        </TableCell>
-                        <TableCell align="right">{formatCurrency(order.sub_total)}</TableCell>
-                        <TableCell align="right" sx={{ color: '#8b5cf6' }}>{formatCurrency((parseFloat(order.cgst || 0) + parseFloat(order.sgst || 0)))}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold', color: '#059669' }}>{formatCurrency(order.total)}</TableCell>
-                      </TableRow>
-                    ))}
-                    {filteredOrders.length === 0 && (
-                      <TableRow><TableCell colSpan={8} align="center" sx={{ py: 4, color: '#94a3b8' }}>No purchase orders found</TableCell></TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          ) : null}
+          <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: `1px solid ${tokens.tableBorder}`, overflowX: 'auto' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Typography variant="h6" fontWeight="bold" color={tokens.textPrimary}>Purchase Order Details</Typography>
+            </Box>
+            <Divider />
+            <Table sx={{ minWidth: 900 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>PO Number</TableCell>
+                  <TableCell>Vendor</TableCell>
+                  <TableCell>Order Date</TableCell>
+                  <TableCell>Delivery Date</TableCell>
+                  <TableCell align="right">Items</TableCell>
+                  <TableCell align="right">Sub Total</TableCell>
+                  <TableCell align="right">Tax</TableCell>
+                  <TableCell align="right">Total</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredOrders.map((order, idx) => (
+                  <TableRow key={idx} sx={{ '&:hover': { bgcolor: tokens.tableRowHover }, transition: 'background 0.2s' }}>
+                    <TableCell>
+                      <Typography fontWeight="medium" color={tokens.chartBlue}>{order.purchase_order_no}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ bgcolor: tokens.chartBlue, width: 30, height: 30, fontSize: 12 }}>
+                          {order.vendor_name?.charAt(0) || '?'}
+                        </Avatar>
+                        <Typography variant="body2">{order.vendor_name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{formatDate(order.purchase_order_date)}</TableCell>
+                    <TableCell>{formatDate(order.delivery_date)}</TableCell>
+                    <TableCell align="right">
+                      <Chip label={`${order.item_count} items`} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
+                    </TableCell>
+                    <TableCell align="right">{formatCurrency(order.sub_total)}</TableCell>
+                    <TableCell align="right" sx={{ color: tokens.chartViolet }}>{formatCurrency((parseFloat(order.cgst || 0) + parseFloat(order.sgst || 0)))}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', color: '#059669' }}>{formatCurrency(order.total)}</TableCell>
+                  </TableRow>
+                ))}
+                {filteredOrders.length === 0 && (
+                  <TableRow><TableCell colSpan={8} align="center" sx={{ py: 4, color: tokens.textSecondary }}>No purchase orders found</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      ) : null}
     </AppLayout>
   );
 };
