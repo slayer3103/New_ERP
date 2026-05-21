@@ -134,31 +134,31 @@ const POSummaries = () => {
               </Box>
 
               <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={7}>
+                <Grid item xs={12} md={6}>
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
-                      Top 10 Vendors by Spend
+                      Top 10 Vendors by Spending
                     </Typography>
-                    <Box sx={{ height: 350, width: '100%', minHeight: 350 }}>
+                    <Box sx={{ height: 450, width: '100%', minHeight: 450 }}>
                       <ResponsiveContainer>
                         <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                           <XAxis type="number" tickFormatter={(val) => `₹${val/1000}k`} />
-                          <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
+                          <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 12 }} />
                           <RechartsTooltip formatter={(value) => formatCurrency(value)} />
                           <Legend />
-                          <Bar dataKey="total_spent" name="Spend" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                          <Bar dataKey="total_spent" name="Spending" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </Box>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} md={5}>
+                <Grid item xs={12} md={6}>
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Orders by Vendor
                     </Typography>
-                    <Box sx={{ height: 350, width: '100%', minHeight: 350 }}>
+                    <Box sx={{ height: 450, width: '100%', minHeight: 450 }}>
                       <ResponsiveContainer>
                         <PieChart>
                           <Pie
