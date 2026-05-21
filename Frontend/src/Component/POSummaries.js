@@ -134,7 +134,7 @@ const POSummaries = () => {
               </Box>
 
               <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={8}>
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Top 10 Vendors by Spending
@@ -153,7 +153,7 @@ const POSummaries = () => {
                     </Box>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Orders by Vendor
