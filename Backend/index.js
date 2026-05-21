@@ -22,7 +22,7 @@ const allowedOrigins = [
   "https://erpbyl.vercel.app",
 
   // erp source 4
-  "https://erp-b.vercel.app"
+  "https://erp-b.vercel.app",
 
   // erp localhost options
   "http://localhost:3000",
