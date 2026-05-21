@@ -115,7 +115,7 @@ const VendorSpendAnalysis = () => {
                 />
               </Paper>
 
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
                 <Box sx={{ p: 2 }}>
                   <Typography variant="h6" fontWeight="bold" color="#1e293b">Vendor Spend Breakdown</Typography>
                 </Box>

@@ -95,9 +95,9 @@ const GstSummary = () => {
 
   return (
     <AppLayout title="GST Summary">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: 'white' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #0f766e 0%, #115e59 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>🧾 GST Summary Report</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>Monthly breakdown of CGST, SGST, and IGST collected</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, color: 'rgba(255,255,255,0.9)' }}>Monthly breakdown of CGST, SGST, and IGST collected</Typography>
           </Paper>
 
           {loading ? (
@@ -121,7 +121,7 @@ const GstSummary = () => {
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       GST Composition
                     </Typography>
-                    <Box sx={{ height: 250, width: '100%' }}>
+                    <Box sx={{ height: 320, width: '100%', minHeight: 320 }}>
                       <ResponsiveContainer>
                         <PieChart>
                           <Pie
@@ -149,7 +149,7 @@ const GstSummary = () => {
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Monthly GST Breakdown
                     </Typography>
-                    <Box sx={{ height: 250, width: '100%' }}>
+                    <Box sx={{ height: 320, width: '100%', minHeight: 320 }}>
                       <ResponsiveContainer>
                         <BarChart data={data.monthly} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />

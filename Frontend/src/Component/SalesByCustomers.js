@@ -187,10 +187,10 @@ const SalesByCustomers = () => {
                         <ToggleButton value="pie"><PieChartIcon fontSize="small" /></ToggleButton>
                       </ToggleButtonGroup>
                     </Box>
-                    <Box sx={{ height: 320, width: '100%' }}>
+                    <Box sx={{ height: 380, width: '100%', minHeight: 380 }}>
                       <ResponsiveContainer>
                         {chartView === 'bar' ? (
-                          <BarChart data={barChartData} margin={{ top: 5, right: 20, left: 10, bottom: 60 }}>
+                          <BarChart data={barChartData} margin={{ top: 5, right: 20, left: 10, bottom: 70 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                             <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} angle={-35} textAnchor="end" interval={0} />
                             <YAxis tickFormatter={(val) => `₹${val / 1000}k`} tick={{ fontSize: 11, fill: '#64748b' }} />
@@ -296,7 +296,7 @@ const SalesByCustomers = () => {
                     />
                   </Box>
                 </Box>
-                <TableContainer>
+                <TableContainer sx={{ overflowX: 'auto' }}>
                   <Table>
                     <TableHead>
                       <TableRow sx={{ bgcolor: '#f8fafc' }}>

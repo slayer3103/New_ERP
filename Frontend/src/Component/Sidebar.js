@@ -103,7 +103,7 @@ const drawerContent = (location, onNavigate) => (
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: 64,
+        height: 80,
         px: 2,
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         flexShrink: 0,
@@ -113,8 +113,8 @@ const drawerContent = (location, onNavigate) => (
         src={ui}
         alt="Logo"
         style={{
-          maxHeight: 40,
-          maxWidth: '100%',
+          maxHeight: 56,
+          maxWidth: '80%',
           objectFit: 'contain',
           display: 'block',
           filter: 'brightness(0) invert(1)',

@@ -139,7 +139,7 @@ const POSummaries = () => {
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Top 10 Vendors by Spend
                     </Typography>
-                    <Box sx={{ height: 300, width: '100%' }}>
+                    <Box sx={{ height: 350, width: '100%', minHeight: 350 }}>
                       <ResponsiveContainer>
                         <BarChart data={vendorData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
@@ -158,7 +158,7 @@ const POSummaries = () => {
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>
                       Orders by Vendor
                     </Typography>
-                    <Box sx={{ height: 300, width: '100%' }}>
+                    <Box sx={{ height: 350, width: '100%', minHeight: 350 }}>
                       <ResponsiveContainer>
                         <PieChart>
                           <Pie
@@ -194,7 +194,7 @@ const POSummaries = () => {
                 />
               </Paper>
 
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
                 <Box sx={{ p: 2 }}>
                   <Typography variant="h6" fontWeight="bold" color="#1e293b">Purchase Order Details</Typography>
                 </Box>

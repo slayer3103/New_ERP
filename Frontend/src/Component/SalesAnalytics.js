@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Paper, Grid, Button, Card, CardContent,
   Avatar, Chip, CircularProgress, Alert,
   Divider, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, LinearProgress,
+  TableHead, TableRow, LinearProgress, IconButton,
 } from '@mui/material';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
@@ -11,6 +11,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PeopleIcon from '@mui/icons-material/People';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AppLayout from '../layouts/AppLayout';
 import axios from 'axios';
 import BASE_URL from '../config/api';
@@ -22,8 +24,56 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 const STATUS_COLORS = { Paid: '#10b981', Draft: '#94a3b8', Partial: '#f59e0b' };
 
+/* ─── Period Navigation Helpers ─── */
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+const getMonthLabel = (offset) => {
+  const d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+};
+
+const getQuarterLabel = (offset) => {
+  const d = new Date();
+  const currentQuarter = Math.floor(d.getMonth() / 3);
+  const totalQuarter = currentQuarter + offset;
+  const yearOffset = Math.floor(totalQuarter / 4);
+  const q = ((totalQuarter % 4) + 4) % 4;
+  const year = d.getFullYear() + yearOffset;
+  return `Q${q + 1} ${year}`;
+};
+
+const getHalfYearLabel = (offset) => {
+  const d = new Date();
+  const currentHalf = Math.floor(d.getMonth() / 6);
+  const totalHalf = currentHalf + offset;
+  const yearOffset = Math.floor(totalHalf / 2);
+  const h = ((totalHalf % 2) + 2) % 2;
+  const year = d.getFullYear() + yearOffset;
+  return `${h === 0 ? 'H1' : 'H2'} ${year} (${h === 0 ? 'Jan–Jun' : 'Jul–Dec'})`;
+};
+
+const getYearLabel = (offset) => {
+  const year = new Date().getFullYear() + offset;
+  return `${year}`;
+};
+
+const getPeriodLabel = (period, offset) => {
+  switch (period) {
+    case 'monthly': return getMonthLabel(offset);
+    case 'quarterly': return getQuarterLabel(offset);
+    case 'six_months': return getHalfYearLabel(offset);
+    case 'yearly': return getYearLabel(offset);
+    default: return '';
+  }
+};
+
 const SalesAnalytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [periodOffset, setPeriodOffset] = useState(0);
   const [analyticsData, setAnalyticsData] = useState(null);
   const [detailedData, setDetailedData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,13 +86,13 @@ const SalesAnalytics = () => {
     { value: 'yearly', label: 'Yearly', icon: '🗓️' },
   ];
 
-  const fetchAnalytics = async (period) => {
+  const fetchAnalytics = useCallback(async (period, offset) => {
     setLoading(true);
     setError(null);
     try {
       const [summaryRes, detailRes] = await Promise.all([
-        axios.get(`${BASE_URL}/invoice/analytics/sales?period=${period}`),
-        axios.get(`${BASE_URL}/analytics/sales/detailed?period=${period}`),
+        axios.get(`${BASE_URL}/invoice/analytics/sales?period=${period}&offset=${offset}`),
+        axios.get(`${BASE_URL}/analytics/sales/detailed?period=${period}&offset=${offset}`),
       ]);
       setAnalyticsData(summaryRes.data[0] || null);
       setDetailedData(detailRes.data || null);
@@ -52,9 +102,14 @@ const SalesAnalytics = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchAnalytics(selectedPeriod); }, [selectedPeriod]);
+  useEffect(() => { fetchAnalytics(selectedPeriod, periodOffset); }, [selectedPeriod, periodOffset, fetchAnalytics]);
+
+  const handlePeriodChange = (newPeriod) => {
+    setSelectedPeriod(newPeriod);
+    setPeriodOffset(0); // Reset offset when switching period type
+  };
 
   const formatCurrency = (amount) => {
     return `₹${new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount || 0)}`;
@@ -108,13 +163,13 @@ const SalesAnalytics = () => {
   return (
     <AppLayout title="Sales Analytics">
           {/* Period Filter */}
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>📊 Sales Performance Dashboard</Typography>
             <Typography variant="body2" sx={{ mb: 3, opacity: 0.9 }}>Analyze your sales data across different time periods</Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {periods.map((p) => (
                 <Button key={p.value} variant={selectedPeriod === p.value ? 'contained' : 'outlined'}
-                  onClick={() => setSelectedPeriod(p.value)}
+                  onClick={() => handlePeriodChange(p.value)}
                   sx={{
                     borderRadius: '12px', px: 3, py: 1, textTransform: 'none', fontWeight: 'bold',
                     backgroundColor: selectedPeriod === p.value ? 'rgba(255,255,255,0.2)' : 'transparent',
@@ -125,6 +180,52 @@ const SalesAnalytics = () => {
                 >{p.label}</Button>
               ))}
             </Box>
+          </Paper>
+
+          {/* Period Navigation — Select specific month/quarter/half/year */}
+          <Paper elevation={0} sx={{
+            p: 2, borderRadius: '14px', mb: 3,
+            border: '1px solid #e2e8f0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2,
+          }}>
+            <IconButton
+              onClick={() => setPeriodOffset(prev => prev - 1)}
+              sx={{
+                bgcolor: '#f1f5f9',
+                '&:hover': { bgcolor: '#e2e8f0' },
+                width: 40, height: 40,
+              }}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+            <Box sx={{ textAlign: 'center', minWidth: 220 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {selectedPeriod === 'monthly' ? 'Month' : selectedPeriod === 'quarterly' ? 'Quarter' : selectedPeriod === 'six_months' ? 'Half Year' : 'Year'}
+              </Typography>
+              <Typography variant="h6" fontWeight="bold" color="#1e293b">
+                {getPeriodLabel(selectedPeriod, periodOffset)}
+              </Typography>
+            </Box>
+            <IconButton
+              onClick={() => setPeriodOffset(prev => prev + 1)}
+              disabled={periodOffset >= 0}
+              sx={{
+                bgcolor: periodOffset >= 0 ? '#f8fafc' : '#f1f5f9',
+                '&:hover': { bgcolor: '#e2e8f0' },
+                width: 40, height: 40,
+              }}
+            >
+              <ChevronRightIcon />
+            </IconButton>
+            {periodOffset !== 0 && (
+              <Button
+                size="small"
+                onClick={() => setPeriodOffset(0)}
+                sx={{ textTransform: 'none', fontWeight: 600, color: '#3b82f6', ml: 1 }}
+              >
+                Current
+              </Button>
+            )}
           </Paper>
 
           {loading ? (
@@ -177,23 +278,25 @@ const SalesAnalytics = () => {
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>📈 Revenue Trend</Typography>
                     {detailedData?.dailyTrends?.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={280}>
-                        <AreaChart data={detailedData.dailyTrends}>
-                          <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#667eea" stopOpacity={0.3} />
-                              <stop offset="95%" stopColor="#667eea" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                          <XAxis dataKey="day_label" tick={{ fontSize: 11, fill: '#64748b' }} />
-                          <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Area type="monotone" dataKey="revenue" stroke="#667eea" fill="url(#colorRevenue)" strokeWidth={2.5} name="Revenue" />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      <Box sx={{ width: '100%', minHeight: 320 }}>
+                        <ResponsiveContainer width="100%" height={320}>
+                          <AreaChart data={detailedData.dailyTrends}>
+                            <defs>
+                              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#667eea" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#667eea" stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                            <XAxis dataKey="day_label" tick={{ fontSize: 11, fill: '#64748b' }} />
+                            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
+                            <Tooltip content={<CustomTooltip />} />
+                            <Area type="monotone" dataKey="revenue" stroke="#667eea" fill="url(#colorRevenue)" strokeWidth={2.5} name="Revenue" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </Box>
                     ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 280, color: '#94a3b8' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 320, color: '#94a3b8' }}>
                         <Typography>No trend data available for this period</Typography>
                       </Box>
                     )}
@@ -205,19 +308,21 @@ const SalesAnalytics = () => {
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #e2e8f0', height: '100%' }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>🎯 Status Distribution</Typography>
                     {pieData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={280}>
-                        <PieChart>
-                          <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
-                            {pieData.map((entry, i) => (
-                              <Cell key={i} fill={STATUS_COLORS[entry.name] || COLORS[i % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(v) => formatCurrency(v)} />
-                          <Legend formatter={(v) => <span style={{ fontSize: 12, color: '#334155' }}>{v}</span>} />
-                        </PieChart>
-                      </ResponsiveContainer>
+                      <Box sx={{ width: '100%', minHeight: 320 }}>
+                        <ResponsiveContainer width="100%" height={320}>
+                          <PieChart>
+                            <Pie data={pieData} cx="50%" cy="45%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
+                              {pieData.map((entry, i) => (
+                                <Cell key={i} fill={STATUS_COLORS[entry.name] || COLORS[i % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(v) => formatCurrency(v)} />
+                            <Legend formatter={(v) => <span style={{ fontSize: 12, color: '#334155' }}>{v}</span>} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </Box>
                     ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 280, color: '#94a3b8' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 320, color: '#94a3b8' }}>
                         <Typography>No data</Typography>
                       </Box>
                     )}
@@ -229,17 +334,19 @@ const SalesAnalytics = () => {
               {detailedData?.trends?.length > 1 && (
                 <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, border: '1px solid #e2e8f0' }}>
                   <Typography variant="h6" fontWeight="bold" color="#1e293b" sx={{ mb: 2 }}>📊 Monthly Breakdown</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={detailedData.trends} barGap={4}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="short_label" tick={{ fontSize: 12, fill: '#64748b' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend />
-                      <Bar dataKey="collected" name="Collected" fill="#10b981" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="pending" name="Pending" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <Box sx={{ width: '100%', minHeight: 340 }}>
+                    <ResponsiveContainer width="100%" height={340}>
+                      <BarChart data={detailedData.trends} barGap={4}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                        <XAxis dataKey="short_label" tick={{ fontSize: 12, fill: '#64748b' }} />
+                        <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Legend />
+                        <Bar dataKey="collected" name="Collected" fill="#10b981" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="pending" name="Pending" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Box>
                 </Paper>
               )}
 
@@ -247,7 +354,7 @@ const SalesAnalytics = () => {
               <Grid container spacing={3} sx={{ mb: 3 }}>
                 {/* Key Insights */}
                 <Grid item xs={12} md={4}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', height: '100%' }}>
+                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', color: 'white', height: '100%' }}>
                     <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>💡 Key Insights</Typography>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" sx={{ opacity: 0.8, mb: 0.5 }}>Collection Rate</Typography>
@@ -312,12 +419,12 @@ const SalesAnalytics = () => {
 
               {/* Recent Invoices Table */}
               {detailedData?.recentInvoices?.length > 0 && (
-                <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
                   <Box sx={{ p: 2 }}>
                     <Typography variant="h6" fontWeight="bold" color="#1e293b">🧾 Recent Invoices</Typography>
                   </Box>
                   <Divider />
-                  <Table>
+                  <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                       <TableRow sx={{ bgcolor: '#f8fafc' }}>
                         <TableCell sx={{ fontWeight: 'bold', color: '#334155' }}>Invoice #</TableCell>

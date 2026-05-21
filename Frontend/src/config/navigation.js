@@ -89,10 +89,10 @@ export const othersItems = [
     roles: ['superadmin'],
   },
   {
-    text: 'Financial Year Settings',
-    icon: EventNote,
-    path: '/add-financial-year-settings',
-    matchPaths: ['/add-financial-year-settings'],
+    text: 'Payments',
+    icon: Payments,
+    path: '/Payment-settings',
+    matchPaths: ['/Payment-settings', '/Add-Payment-settings'],
     roles: ['superadmin'],
   },
   {
@@ -115,10 +115,10 @@ export const othersItems = [
     roles: ['superadmin'],
   },
   {
-    text: 'Payment Settings',
-    icon: Payments,
-    path: '/Payment-settings',
-    matchPaths: ['/Payment-settings', '/Add-Payment-settings'],
+    text: 'Financial Year Settings',
+    icon: EventNote,
+    path: '/add-financial-year-settings',
+    matchPaths: ['/add-financial-year-settings', '/add/financial_year'],
     roles: ['superadmin'],
   },
 ];

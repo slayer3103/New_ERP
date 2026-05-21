@@ -78,9 +78,9 @@ const TaxLiability = () => {
 
   return (
     <AppLayout title="Tax Liability">
-          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #dc2626 0%, #f59e0b 100%)', color: 'white' }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', mb: 3, background: 'linear-gradient(135deg, #1e293b 0%, #4338ca 100%)', color: 'white' }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'white' }}>⚖️ Tax Liability Reports</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>Track your GST tax liability — collected vs pending</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, color: 'rgba(255,255,255,0.9)' }}>Track your GST tax liability — collected vs pending</Typography>
           </Paper>
 
           {loading ? (
@@ -121,7 +121,7 @@ const TaxLiability = () => {
               )}
 
               {/* Invoice-level Tax Detail */}
-              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <TableContainer component={Paper} elevation={0} sx={{ borderRadius: '16px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
                 <Box sx={{ p: 2 }}>
                   <Typography variant="h6" fontWeight="bold" color="#1e293b">Invoice-Level Tax Details</Typography>
                 </Box>
