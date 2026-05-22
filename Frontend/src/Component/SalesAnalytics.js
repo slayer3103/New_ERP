@@ -151,7 +151,7 @@ const SalesAnalytics = () => {
           {/* Charts Row */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
             {/* Revenue Trend Chart — Enhanced */}
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={7}>
               <ChartCard
                 title="📈 Revenue Trend"
                 subtitle="Daily revenue over the selected period"
@@ -202,7 +202,7 @@ const SalesAnalytics = () => {
             </Grid>
 
             {/* Status Pie Chart — Enhanced Donut */}
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={5}>
               <ChartCard
                 title="🎯 Status Distribution"
                 subtitle="Invoice amounts by status"
