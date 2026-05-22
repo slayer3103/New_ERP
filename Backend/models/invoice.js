@@ -361,77 +361,100 @@ const invoice = {
     });
   },
 
-  getSalesAnalyticsByPeriod: (period, callback) => {
+  getSalesAnalyticsByPeriod: (period, offset = 0, callback) => {
+    // Support (period, callback) signature for backwards compatibility
+    if (typeof offset === 'function') {
+      callback = offset;
+      offset = 0;
+    }
+    offset = parseInt(offset) || 0;
+
     let dateCondition = '';
     let groupBy = '';
     let selectFields = '';
-    
-    const currentDate = new Date();
-    
-    switch (period) {
-      case 'monthly':
-        // Current month
-        dateCondition = `
-          YEAR(invoice_date) = YEAR(CURDATE()) 
-          AND MONTH(invoice_date) = MONTH(CURDATE())
-        `;
-        selectFields = `
-          'Current Month' as period_name,
-          MONTHNAME(CURDATE()) as period_label,
-          YEAR(CURDATE()) as year
-        `;
-        groupBy = 'YEAR(invoice_date), MONTH(invoice_date)';
-        break;
-        
-      case 'quarterly':
-        // Current quarter
-        dateCondition = `
-          YEAR(invoice_date) = YEAR(CURDATE()) 
-          AND QUARTER(invoice_date) = QUARTER(CURDATE())
-        `;
-        selectFields = `
-          'Current Quarter' as period_name,
-          CONCAT('Q', QUARTER(CURDATE()), ' ', YEAR(CURDATE())) as period_label,
-          QUARTER(CURDATE()) as quarter,
-          YEAR(CURDATE()) as year
-        `;
-        groupBy = 'YEAR(invoice_date), QUARTER(invoice_date)';
-        break;
-        
-      case 'yearly':
-        // Current year
-        dateCondition = `YEAR(invoice_date) = YEAR(CURDATE())`;
-        selectFields = `
-          'Current Year' as period_name,
-          YEAR(CURDATE()) as period_label,
-          YEAR(CURDATE()) as year
-        `;
-        groupBy = 'YEAR(invoice_date)';
-        break;
-        
-      case 'six_months':
-        // Last 6 months
-        dateCondition = `invoice_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)`;
-        selectFields = `
-          'Last 6 Months' as period_name,
-          'Last 6 Months' as period_label,
-          YEAR(CURDATE()) as year
-        `;
-        groupBy = '1'; // Group all together
-        break;
-        
-      default:
-        // Default to current month
-        dateCondition = `
-          YEAR(invoice_date) = YEAR(CURDATE()) 
-          AND MONTH(invoice_date) = MONTH(CURDATE())
-        `;
-        selectFields = `
-          'Current Month' as period_name,
-          MONTHNAME(CURDATE()) as period_label,
-          YEAR(CURDATE()) as year
-        `;
-        groupBy = 'YEAR(invoice_date), MONTH(invoice_date)';
+
+    if (period === 'all') {
+      // All-time: no date filter
+      dateCondition = '1=1';
+      selectFields = `
+        'All Time' as period_name,
+        'All Time' as period_label,
+        YEAR(CURDATE()) as year
+      `;
+      groupBy = '1';
+    } else {
+      switch (period) {
+        case 'monthly': {
+          // Use offset to shift from current month
+          dateCondition = `
+            YEAR(invoice_date) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) 
+            AND MONTH(invoice_date) = MONTH(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))
+          `;
+          selectFields = `
+            CONCAT(MONTHNAME(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)), ' ', YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))) as period_name,
+            MONTHNAME(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) as period_label,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) as year
+          `;
+          groupBy = 'YEAR(invoice_date), MONTH(invoice_date)';
+          break;
+        }
+
+        case 'quarterly': {
+          // Compute target quarter using offset
+          dateCondition = `
+            YEAR(invoice_date) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH))
+            AND QUARTER(invoice_date) = QUARTER(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH))
+          `;
+          selectFields = `
+            CONCAT('Q', QUARTER(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH)), ' ', YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH))) as period_name,
+            CONCAT('Q', QUARTER(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH)), ' ', YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH))) as period_label,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH)) as year
+          `;
+          groupBy = 'YEAR(invoice_date), QUARTER(invoice_date)';
+          break;
+        }
+
+        case 'six_months': {
+          // 6-month window shifted by offset (each offset = 6 months)
+          dateCondition = `
+            invoice_date >= DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), INTERVAL ${offset * 6} MONTH)
+            AND invoice_date < DATE_ADD(CURDATE(), INTERVAL ${offset * 6} MONTH)
+          `;
+          selectFields = `
+            'Half Year' as period_name,
+            CONCAT(DATE_FORMAT(DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), INTERVAL ${offset * 6} MONTH), '%b %Y'),
+                   ' – ',
+                   DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL ${offset * 6} MONTH), '%b %Y')) as period_label,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 6} MONTH)) as year
+          `;
+          groupBy = '1';
+          break;
+        }
+
+        case 'yearly': {
+          dateCondition = `YEAR(invoice_date) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} YEAR))`;
+          selectFields = `
+            CONCAT('Year ', YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} YEAR))) as period_name,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} YEAR)) as period_label,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} YEAR)) as year
+          `;
+          groupBy = 'YEAR(invoice_date)';
+          break;
+        }
+
+        default: {
+          dateCondition = `
+            YEAR(invoice_date) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) 
+            AND MONTH(invoice_date) = MONTH(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))
+          `;
+          selectFields = `
+            CONCAT(MONTHNAME(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)), ' ', YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))) as period_name,
+            MONTHNAME(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) as period_label,
+            YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) as year
+          `;
+          groupBy = 'YEAR(invoice_date), MONTH(invoice_date)';
+        }
+      }
     }
 
     const sql = `
@@ -457,12 +480,11 @@ const invoice = {
       // If no results, return default structure
       if (results.length === 0) {
         const defaultResult = {
-          period_name: period === 'monthly' ? 'Current Month' : 
-                      period === 'quarterly' ? 'Current Quarter' :
-                      period === 'yearly' ? 'Current Year' : 'Last 6 Months',
-          period_label: period === 'monthly' ? new Date().toLocaleString('default', { month: 'long' }) :
-                       period === 'quarterly' ? `Q${Math.ceil((new Date().getMonth() + 1) / 3)} ${new Date().getFullYear()}` :
-                       period === 'yearly' ? new Date().getFullYear().toString() : 'Last 6 Months',
+          period_name: period === 'all' ? 'All Time' :
+                      period === 'monthly' ? 'Month' : 
+                      period === 'quarterly' ? 'Quarter' :
+                      period === 'yearly' ? 'Year' : 'Half Year',
+          period_label: period === 'all' ? 'All Time' : 'No Data',
           total_invoices: 0,
           completed_invoices: 0,
           pending_invoices: 0,

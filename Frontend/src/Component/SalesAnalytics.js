@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Paper, Grid, Button,
+  Box, Typography, Paper, Grid,
   Avatar, Chip, CircularProgress, Alert,
   Divider, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, LinearProgress, IconButton,
+  TableHead, TableRow, LinearProgress,
 } from '@mui/material';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
@@ -11,19 +11,19 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PeopleIcon from '@mui/icons-material/People';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import AppLayout from '../layouts/AppLayout';
 import ReportPageHeader from '../components/common/ReportPageHeader';
 import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
 import ChartCard from '../components/common/ChartCard';
+import PeriodFilter from '../components/common/PeriodFilter';
+import GlassTooltip from '../components/common/GlassTooltip';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 import { tokens, CHART_PALETTE } from '../theme/paletteTokens';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend,
+  ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend, Label,
 } from 'recharts';
 
 const STATUS_COLORS = {
@@ -32,51 +32,19 @@ const STATUS_COLORS = {
   Partial: tokens.statusPartial,
 };
 
-/* ─── Period Navigation Helpers ─── */
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-const getMonthLabel = (offset) => {
-  const d = new Date();
-  d.setMonth(d.getMonth() + offset);
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
-};
-
-const getQuarterLabel = (offset) => {
-  const d = new Date();
-  const currentQuarter = Math.floor(d.getMonth() / 3);
-  const totalQuarter = currentQuarter + offset;
-  const yearOffset = Math.floor(totalQuarter / 4);
-  const q = ((totalQuarter % 4) + 4) % 4;
-  const year = d.getFullYear() + yearOffset;
-  return `Q${q + 1} ${year}`;
-};
-
-const getHalfYearLabel = (offset) => {
-  const d = new Date();
-  const currentHalf = Math.floor(d.getMonth() / 6);
-  const totalHalf = currentHalf + offset;
-  const yearOffset = Math.floor(totalHalf / 2);
-  const h = ((totalHalf % 2) + 2) % 2;
-  const year = d.getFullYear() + yearOffset;
-  return `${h === 0 ? 'H1' : 'H2'} ${year} (${h === 0 ? 'Jan–Jun' : 'Jul–Dec'})`;
-};
-
-const getYearLabel = (offset) => {
-  const year = new Date().getFullYear() + offset;
-  return `${year}`;
-};
-
-const getPeriodLabel = (period, offset) => {
-  switch (period) {
-    case 'monthly': return getMonthLabel(offset);
-    case 'quarterly': return getQuarterLabel(offset);
-    case 'six_months': return getHalfYearLabel(offset);
-    case 'yearly': return getYearLabel(offset);
-    default: return '';
-  }
+/* ─── Custom Pie Center Label ─── */
+const PieCenterLabel = ({ viewBox, value }) => {
+  const { cx, cy } = viewBox;
+  return (
+    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
+      <tspan x={cx} y={cy - 8} fontSize="11" fill={tokens.textSecondary} fontWeight="500">
+        Total
+      </tspan>
+      <tspan x={cx} y={cy + 12} fontSize="15" fill={tokens.textPrimary} fontWeight="700">
+        {value}
+      </tspan>
+    </text>
+  );
 };
 
 const SalesAnalytics = () => {
@@ -86,13 +54,6 @@ const SalesAnalytics = () => {
   const [detailedData, setDetailedData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const periods = [
-    { value: 'monthly', label: 'Monthly', icon: '📅' },
-    { value: 'quarterly', label: 'Quarterly', icon: '📊' },
-    { value: 'six_months', label: '6 Months', icon: '📈' },
-    { value: 'yearly', label: 'Yearly', icon: '🗓️' },
-  ];
 
   const fetchAnalytics = useCallback(async (period, offset) => {
     setLoading(true);
@@ -116,7 +77,7 @@ const SalesAnalytics = () => {
 
   const handlePeriodChange = (newPeriod) => {
     setSelectedPeriod(newPeriod);
-    setPeriodOffset(0); // Reset offset when switching period type
+    setPeriodOffset(0);
   };
 
   const formatCurrency = (amount) => {
@@ -128,26 +89,14 @@ const SalesAnalytics = () => {
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload?.length) return null;
-    return (
-      <Paper sx={{ p: 1.5, borderRadius: '10px', border: `1px solid ${tokens.tableBorder}` }}>
-        <Typography variant="caption" fontWeight="bold">{label}</Typography>
-        {payload.map((p, i) => (
-          <Typography key={i} variant="caption" display="block" sx={{ color: p.color }}>
-            {p.name}: {typeof p.value === 'number' && p.value > 100 ? formatCurrency(p.value) : p.value}
-          </Typography>
-        ))}
-      </Paper>
-    );
-  };
-
   const collectionRate = analyticsData?.total_invoices > 0 ? Math.round((analyticsData.completed_invoices / analyticsData.total_invoices) * 100) : 0;
   const revenueRate = analyticsData?.total_amount > 0 ? Math.round((analyticsData.completed_amount / analyticsData.total_amount) * 100) : 0;
 
   const pieData = detailedData?.statusDistribution?.map(s => ({
     name: s.status, value: parseFloat(s.amount) || 0, count: s.count,
   })) || [];
+
+  const pieTotal = pieData.reduce((sum, d) => sum + d.count, 0);
 
   return (
     <AppLayout title="Sales Analytics">
@@ -158,113 +107,13 @@ const SalesAnalytics = () => {
         icon={ShowChartIcon}
       />
 
-      {/* ─── Period Filter — Segmented Pill Tabs ─── */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 1.5, sm: 2 },
-          borderRadius: '14px',
-          mb: 3,
-          border: `1px solid ${tokens.tableBorder}`,
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 1,
-            flexWrap: 'wrap',
-            bgcolor: tokens.surfaceSubtle,
-            borderRadius: '10px',
-            p: 0.5,
-          }}
-        >
-          {periods.map((p) => (
-            <Button
-              key={p.value}
-              onClick={() => handlePeriodChange(p.value)}
-              sx={{
-                flex: { xs: '1 1 45%', sm: '1 1 auto' },
-                borderRadius: '8px',
-                px: { xs: 2, sm: 3 },
-                py: 1,
-                textTransform: 'none',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                minWidth: 0,
-                bgcolor: selectedPeriod === p.value ? tokens.primary : 'transparent',
-                color: selectedPeriod === p.value ? '#fff' : tokens.textSecondary,
-                boxShadow: selectedPeriod === p.value ? '0 2px 8px rgba(37, 99, 235, 0.3)' : 'none',
-                '&:hover': {
-                  bgcolor: selectedPeriod === p.value ? tokens.primaryHover : tokens.surfaceHover,
-                },
-                transition: 'all 0.2s ease',
-              }}
-              startIcon={<span style={{ fontSize: '14px' }}>{p.icon}</span>}
-            >
-              {p.label}
-            </Button>
-          ))}
-        </Box>
-      </Paper>
-
-      {/* ─── Period Navigation ─── */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 1.5, sm: 2 },
-          borderRadius: '14px',
-          mb: 3,
-          border: `1px solid ${tokens.tableBorder}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: { xs: 1, sm: 2 },
-          flexWrap: 'wrap',
-        }}
-      >
-        <IconButton
-          onClick={() => setPeriodOffset(prev => prev - 1)}
-          sx={{
-            bgcolor: tokens.surfaceHover,
-            '&:hover': { bgcolor: tokens.tableBorder },
-            width: 40, height: 40,
-          }}
-        >
-          <ChevronLeftIcon />
-        </IconButton>
-        <Box sx={{ textAlign: 'center', minWidth: { xs: 160, sm: 220 } }}>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}
-          >
-            {selectedPeriod === 'monthly' ? 'Month' : selectedPeriod === 'quarterly' ? 'Quarter' : selectedPeriod === 'six_months' ? 'Half Year' : 'Year'}
-          </Typography>
-          <Typography variant="h6" fontWeight="bold" color={tokens.textPrimary}>
-            {getPeriodLabel(selectedPeriod, periodOffset)}
-          </Typography>
-        </Box>
-        <IconButton
-          onClick={() => setPeriodOffset(prev => prev + 1)}
-          disabled={periodOffset >= 0}
-          sx={{
-            bgcolor: periodOffset >= 0 ? tokens.surfaceSubtle : tokens.surfaceHover,
-            '&:hover': { bgcolor: tokens.tableBorder },
-            width: 40, height: 40,
-          }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
-        {periodOffset !== 0 && (
-          <Button
-            size="small"
-            onClick={() => setPeriodOffset(0)}
-            sx={{ textTransform: 'none', fontWeight: 600, color: tokens.primary, ml: 1 }}
-          >
-            Current
-          </Button>
-        )}
-      </Paper>
+      {/* ─── Period Filter (Shared Component) ─── */}
+      <PeriodFilter
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={handlePeriodChange}
+        periodOffset={periodOffset}
+        onOffsetChange={setPeriodOffset}
+      />
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -301,7 +150,7 @@ const SalesAnalytics = () => {
 
           {/* Charts Row */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
-            {/* Revenue Trend Chart */}
+            {/* Revenue Trend Chart — Enhanced */}
             <Grid item xs={12} md={8}>
               <ChartCard
                 title="📈 Revenue Trend"
@@ -313,22 +162,46 @@ const SalesAnalytics = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={detailedData.dailyTrends}>
                     <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#667eea" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#667eea" stopOpacity={0} />
+                      <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#667eea" stopOpacity={0.35} />
+                        <stop offset="50%" stopColor="#764ba2" stopOpacity={0.12} />
+                        <stop offset="100%" stopColor="#667eea" stopOpacity={0} />
                       </linearGradient>
+                      <linearGradient id="strokeRevenue" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#667eea" />
+                        <stop offset="100%" stopColor="#764ba2" />
+                      </linearGradient>
+                      <filter id="glowRevenue" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={tokens.chartGrid} />
-                    <XAxis dataKey="day_label" tick={{ fontSize: 11, fill: tokens.chartAxisText }} />
-                    <YAxis tick={{ fontSize: 11, fill: tokens.chartAxisText }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} width={65} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="revenue" stroke="#667eea" fill="url(#colorRevenue)" strokeWidth={2.5} name="Revenue" />
+                    <CartesianGrid strokeDasharray="4 4" stroke={tokens.chartGrid} vertical={false} />
+                    <XAxis dataKey="day_label" tick={{ fontSize: 11, fill: tokens.chartAxisText }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: tokens.chartAxisText }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} width={65} axisLine={false} tickLine={false} />
+                    <Tooltip content={<GlassTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="url(#strokeRevenue)"
+                      fill="url(#gradRevenue)"
+                      strokeWidth={3}
+                      name="Revenue"
+                      filter="url(#glowRevenue)"
+                      dot={{ r: 4, fill: '#667eea', stroke: '#fff', strokeWidth: 2 }}
+                      activeDot={{ r: 7, fill: '#764ba2', stroke: '#fff', strokeWidth: 2.5, filter: 'url(#glowRevenue)' }}
+                      animationDuration={1200}
+                      animationEasing="ease-in-out"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </ChartCard>
             </Grid>
 
-            {/* Status Pie Chart */}
+            {/* Status Pie Chart — Enhanced Donut */}
             <Grid item xs={12} md={4}>
               <ChartCard
                 title="🎯 Status Distribution"
@@ -339,32 +212,88 @@ const SalesAnalytics = () => {
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={pieData} cx="50%" cy="45%" innerRadius={55} outerRadius={95} paddingAngle={4} dataKey="value">
-                      {pieData.map((entry, i) => (
-                        <Cell key={i} fill={STATUS_COLORS[entry.name] || CHART_PALETTE[i % CHART_PALETTE.length]} />
+                    <defs>
+                      {Object.entries(STATUS_COLORS).map(([key, color]) => (
+                        <linearGradient key={key} id={`grad-${key}`} x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor={color} stopOpacity={1} />
+                          <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                        </linearGradient>
                       ))}
+                    </defs>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="45%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                      cornerRadius={6}
+                      animationDuration={1000}
+                      animationEasing="ease-out"
+                    >
+                      {pieData.map((entry, i) => (
+                        <Cell
+                          key={i}
+                          fill={`url(#grad-${entry.name})`}
+                          stroke={STATUS_COLORS[entry.name] || CHART_PALETTE[i % CHART_PALETTE.length]}
+                          strokeWidth={1}
+                        />
+                      ))}
+                      <Label content={<PieCenterLabel value={pieTotal} />} position="center" />
                     </Pie>
                     <Tooltip formatter={(v) => formatCurrency(v)} />
-                    <Legend formatter={(v) => <span style={{ fontSize: 12, color: tokens.textPrimary }}>{v}</span>} />
+                    <Legend
+                      formatter={(v) => <span style={{ fontSize: 12, color: tokens.textPrimary, fontWeight: 500 }}>{v}</span>}
+                      iconType="circle"
+                      iconSize={10}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </ChartCard>
             </Grid>
           </Grid>
 
-          {/* Monthly Breakdown Bar Chart (for multi-month periods) */}
+          {/* Monthly Breakdown Bar Chart (for multi-month periods) — Enhanced */}
           {detailedData?.trends?.length > 1 && (
             <Box sx={{ mb: 3 }}>
               <ChartCard title="📊 Monthly Breakdown" subtitle="Collected vs pending amounts per month" height={400}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={detailedData.trends} barGap={4}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={tokens.chartGrid} />
-                    <XAxis dataKey="short_label" tick={{ fontSize: 12, fill: tokens.chartAxisText }} />
-                    <YAxis tick={{ fontSize: 11, fill: tokens.chartAxisText }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} width={65} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="collected" name="Collected" fill={tokens.chartGreen} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="pending" name="Pending" fill={tokens.chartAmber} radius={[4, 4, 0, 0]} />
+                  <BarChart data={detailedData.trends} barGap={6} barCategoryGap="20%">
+                    <defs>
+                      <linearGradient id="gradCollected" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={tokens.chartGreen} stopOpacity={1} />
+                        <stop offset="100%" stopColor={tokens.chartGreen} stopOpacity={0.65} />
+                      </linearGradient>
+                      <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={tokens.chartAmber} stopOpacity={1} />
+                        <stop offset="100%" stopColor={tokens.chartAmber} stopOpacity={0.65} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="4 4" stroke={tokens.chartGrid} vertical={false} />
+                    <XAxis dataKey="short_label" tick={{ fontSize: 12, fill: tokens.chartAxisText }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: tokens.chartAxisText }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} width={65} axisLine={false} tickLine={false} />
+                    <Tooltip content={<GlassTooltip />} />
+                    <Legend
+                      wrapperStyle={{ fontSize: 13 }}
+                      iconType="circle"
+                      iconSize={10}
+                    />
+                    <Bar
+                      dataKey="collected"
+                      name="Collected"
+                      fill="url(#gradCollected)"
+                      radius={[6, 6, 0, 0]}
+                      animationDuration={1000}
+                    />
+                    <Bar
+                      dataKey="pending"
+                      name="Pending"
+                      fill="url(#gradPending)"
+                      radius={[6, 6, 0, 0]}
+                      animationDuration={1000}
+                      animationDelay={200}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>

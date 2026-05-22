@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -33,6 +33,8 @@ import AppLayout from '../layouts/AppLayout';
 import ReportPageHeader from '../components/common/ReportPageHeader';
 import AnalyticsStatCard from '../components/common/AnalyticsStatCard';
 import ChartCard from '../components/common/ChartCard';
+import PeriodFilter from '../components/common/PeriodFilter';
+import GlassTooltip from '../components/common/GlassTooltip';
 import axios from 'axios';
 import BASE_URL from '../config/api';
 import { tokens, CHART_PALETTE } from '../theme/paletteTokens';
@@ -48,26 +50,24 @@ import {
   PieChart,
   Pie,
   Cell,
+  Label,
 } from 'recharts';
 
 const GRADIENT_COLORS = ['#8b5cf6', '#6d28d9', '#7c3aed', '#5b21b6', '#4c1d95'];
 
-const CustomBarTooltip = ({ active, payload, label, formatCurrency }) => {
-  if (active && payload && payload.length) {
-    return (
-      <Paper elevation={3} sx={{ p: 2, borderRadius: '12px', minWidth: 180 }}>
-        <Typography variant="subtitle2" fontWeight="bold" color={tokens.textPrimary} mb={0.5}>{label}</Typography>
-        {payload.map((entry, i) => (
-          <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: entry.color }} />
-            <Typography variant="caption" color="text.secondary">{entry.name}:</Typography>
-            <Typography variant="caption" fontWeight="bold">{formatCurrency(entry.value)}</Typography>
-          </Box>
-        ))}
-      </Paper>
-    );
-  }
-  return null;
+/* ─── Donut Center Label ─── */
+const PieCenterLabel = ({ viewBox, value }) => {
+  const { cx, cy } = viewBox;
+  return (
+    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
+      <tspan x={cx} y={cy - 8} fontSize="11" fill={tokens.textSecondary} fontWeight="500">
+        Products
+      </tspan>
+      <tspan x={cx} y={cy + 12} fontSize="15" fill={tokens.textPrimary} fontWeight="700">
+        {value}
+      </tspan>
+    </text>
+  );
 };
 
 const SalesByProducts = () => {
@@ -76,21 +76,33 @@ const SalesByProducts = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [chartView, setChartView] = useState('bar');
+  const [selectedPeriod, setSelectedPeriod] = useState('all');
+  const [periodOffset, setPeriodOffset] = useState(0);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/analytics/sales/by-products?period=${selectedPeriod}&offset=${periodOffset}`
+      );
+      setData(response.data);
+    } catch (err) {
+      setError('Failed to fetch sales by product data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedPeriod, periodOffset]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/analytics/sales/by-products`);
-        setData(response.data);
-      } catch (err) {
-        setError('Failed to fetch sales by product data');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  const handlePeriodChange = (newPeriod) => {
+    setSelectedPeriod(newPeriod);
+    setPeriodOffset(0);
+  };
 
   const formatCurrency = (amount) => {
     return `₹${new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount || 0)}`;
@@ -130,6 +142,14 @@ const SalesByProducts = () => {
         gradientStart="#667EEA"
         gradientEnd="#764BA2"
         icon={InventoryIcon}
+      />
+
+      {/* ─── Period Filter ─── */}
+      <PeriodFilter
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={handlePeriodChange}
+        periodOffset={periodOffset}
+        onOffsetChange={setPeriodOffset}
       />
 
       {loading ? (
@@ -190,27 +210,59 @@ const SalesByProducts = () => {
                 <ResponsiveContainer>
                   {chartView === 'bar' ? (
                     <BarChart data={barChartData} margin={{ top: 5, right: 20, left: 10, bottom: 80 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={tokens.chartGrid} />
-                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: tokens.chartAxisText }} angle={-35} textAnchor="end" interval={0} />
-                      <YAxis tickFormatter={(val) => `₹${val / 1000}k`} tick={{ fontSize: 11, fill: tokens.chartAxisText }} width={65} />
-                      <RechartsTooltip content={<CustomBarTooltip formatCurrency={formatCurrency} />} />
-                      <Legend wrapperStyle={{ paddingTop: 16, fontSize: 13 }} />
-                      <Bar dataKey="Revenue" fill={tokens.chartViolet} radius={[6, 6, 0, 0]} maxBarSize={40}>
+                      <defs>
+                        {GRADIENT_COLORS.map((color, i) => (
+                          <linearGradient key={i} id={`gradProd${i}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={1} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.6} />
+                          </linearGradient>
+                        ))}
+                        <linearGradient id="gradDiscount" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+                          <stop offset="100%" stopColor="#fbbf24" stopOpacity={0.55} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={tokens.chartGrid} />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: tokens.chartAxisText }} angle={-35} textAnchor="end" interval={0} axisLine={false} tickLine={false} />
+                      <YAxis tickFormatter={(val) => `₹${val / 1000}k`} tick={{ fontSize: 11, fill: tokens.chartAxisText }} width={65} axisLine={false} tickLine={false} />
+                      <RechartsTooltip content={<GlassTooltip />} />
+                      <Legend wrapperStyle={{ paddingTop: 16, fontSize: 13 }} iconType="circle" iconSize={10} />
+                      <Bar dataKey="Revenue" fill={tokens.chartViolet} radius={[6, 6, 0, 0]} maxBarSize={40} animationDuration={1000}>
                         {barChartData.map((_, i) => (
-                          <Cell key={i} fill={GRADIENT_COLORS[i % GRADIENT_COLORS.length]} />
+                          <Cell key={i} fill={`url(#gradProd${i % GRADIENT_COLORS.length})`} />
                         ))}
                       </Bar>
-                      <Bar dataKey="Discount" fill="#fbbf24" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                      <Bar dataKey="Discount" fill="url(#gradDiscount)" radius={[6, 6, 0, 0]} maxBarSize={40} animationDuration={1000} animationDelay={200} />
                     </BarChart>
                   ) : (
                     <PieChart>
-                      <Pie data={pieChartData} cx="50%" cy="50%" outerRadius={110} innerRadius={55} paddingAngle={3} dataKey="value">
-                        {pieChartData.map((_, i) => (
-                          <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
+                      <defs>
+                        {CHART_PALETTE.map((color, i) => (
+                          <linearGradient key={i} id={`gradProdPie${i}`} x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={1} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                          </linearGradient>
                         ))}
+                      </defs>
+                      <Pie
+                        data={pieChartData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={110}
+                        innerRadius={55}
+                        paddingAngle={4}
+                        dataKey="value"
+                        cornerRadius={5}
+                        animationDuration={1000}
+                        animationEasing="ease-out"
+                      >
+                        {pieChartData.map((_, i) => (
+                          <Cell key={i} fill={`url(#gradProdPie${i % CHART_PALETTE.length})`} stroke={CHART_PALETTE[i % CHART_PALETTE.length]} strokeWidth={1} />
+                        ))}
+                        <Label content={<PieCenterLabel value={pieChartData.length} />} position="center" />
                       </Pie>
                       <RechartsTooltip formatter={(val) => formatCurrency(val)} />
-                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" iconSize={8} />
                     </PieChart>
                   )}
                 </ResponsiveContainer>

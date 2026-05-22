@@ -173,9 +173,9 @@ exports.update = (req, res) => {
 };
 
 exports.getSalesAnalytics = (req, res) => {
-  const { period = 'monthly' } = req.query;
+  const { period = 'monthly', offset = 0 } = req.query;
   
-  invoice.getSalesAnalyticsByPeriod(period, (err, analytics) => {
+  invoice.getSalesAnalyticsByPeriod(period, parseInt(offset) || 0, (err, analytics) => {
     if (err) {
       console.error('Error fetching sales analytics:', err);
       return res.status(500).json({ error: err.message });

@@ -11,9 +11,33 @@ function query(sql, values = []) {
   });
 }
 
+// ─── Shared date-condition builder for period + offset queries ────────
+function buildDateCondition(period, offset, tableAlias = 'i') {
+  offset = parseInt(offset) || 0;
+  const col = `${tableAlias}.invoice_date`;
+
+  if (period === 'all') return '1=1';
+
+  switch (period) {
+    case 'monthly':
+      return `YEAR(${col}) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) AND MONTH(${col}) = MONTH(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))`;
+    case 'quarterly':
+      return `YEAR(${col}) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH)) AND QUARTER(${col}) = QUARTER(DATE_ADD(CURDATE(), INTERVAL ${offset * 3} MONTH))`;
+    case 'six_months':
+      return `${col} >= DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), INTERVAL ${offset * 6} MONTH) AND ${col} < DATE_ADD(CURDATE(), INTERVAL ${offset * 6} MONTH)`;
+    case 'yearly':
+      return `YEAR(${col}) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} YEAR))`;
+    default:
+      return `YEAR(${col}) = YEAR(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH)) AND MONTH(${col}) = MONTH(DATE_ADD(CURDATE(), INTERVAL ${offset} MONTH))`;
+  }
+}
+
 // ─── Sales By Customers ───────────────────────────────────────────────
 exports.getSalesByCustomers = async (req, res) => {
   try {
+    const { period = 'all', offset = 0 } = req.query;
+    const dateCondition = buildDateCondition(period, offset);
+
     const sql = `
       SELECT 
         i.customer_name,
@@ -27,12 +51,13 @@ exports.getSalesByCustomers = async (req, res) => {
         COALESCE(AVG(i.grand_total), 0) as avg_invoice_value,
         MAX(i.invoice_date) as last_invoice_date
       FROM invoice i
+      WHERE ${dateCondition}
       GROUP BY i.customer_name, i.customer_id
       ORDER BY total_revenue DESC
     `;
     const results = await query(sql);
 
-    // Also get overall totals
+    // Also get overall totals for the filtered period
     const totalsSql = `
       SELECT 
         COUNT(DISTINCT customer_name) as total_customers,
@@ -40,7 +65,8 @@ exports.getSalesByCustomers = async (req, res) => {
         COALESCE(SUM(grand_total), 0) as total_revenue,
         COALESCE(SUM(CASE WHEN status = 'Paid' THEN grand_total ELSE 0 END), 0) as total_paid,
         COALESCE(SUM(CASE WHEN status IN ('Draft', 'Partial') THEN grand_total ELSE 0 END), 0) as total_outstanding
-      FROM invoice
+      FROM invoice i
+      WHERE ${dateCondition}
     `;
     const totals = await query(totalsSql);
 
@@ -54,6 +80,9 @@ exports.getSalesByCustomers = async (req, res) => {
 // ─── Sales By Products ───────────────────────────────────────────────
 exports.getSalesByProducts = async (req, res) => {
   try {
+    const { period = 'all', offset = 0 } = req.query;
+    const dateCondition = buildDateCondition(period, offset);
+
     const sql = `
       SELECT 
         ii.item_detail as product_name,
@@ -64,6 +93,7 @@ exports.getSalesByProducts = async (req, res) => {
         COALESCE(SUM(ii.discount), 0) as total_discount
       FROM invoice_items ii
       JOIN invoice i ON ii.invoice_id = i.invoice_id
+      WHERE ${dateCondition}
       GROUP BY ii.item_detail
       ORDER BY total_revenue DESC
     `;
@@ -77,6 +107,7 @@ exports.getSalesByProducts = async (req, res) => {
         COALESCE(SUM(ii.discount), 0) as total_discounts
       FROM invoice_items ii
       JOIN invoice i ON ii.invoice_id = i.invoice_id
+      WHERE ${dateCondition}
     `;
     const totals = await query(totalsSql);
 
@@ -388,26 +419,8 @@ exports.getVendorSpendAnalysis = async (req, res) => {
 // ─── Enhanced Sales By Time Period ───────────────────────────────────
 exports.getSalesDetailed = async (req, res) => {
   try {
-    const { period = 'monthly' } = req.query;
-
-    // Build the date filter
-    let dateCondition = '';
-    switch (period) {
-      case 'monthly':
-        dateCondition = `YEAR(i.invoice_date) = YEAR(CURDATE()) AND MONTH(i.invoice_date) = MONTH(CURDATE())`;
-        break;
-      case 'quarterly':
-        dateCondition = `YEAR(i.invoice_date) = YEAR(CURDATE()) AND QUARTER(i.invoice_date) = QUARTER(CURDATE())`;
-        break;
-      case 'six_months':
-        dateCondition = `i.invoice_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)`;
-        break;
-      case 'yearly':
-        dateCondition = `YEAR(i.invoice_date) = YEAR(CURDATE())`;
-        break;
-      default:
-        dateCondition = `YEAR(i.invoice_date) = YEAR(CURDATE()) AND MONTH(i.invoice_date) = MONTH(CURDATE())`;
-    }
+    const { period = 'monthly', offset = 0 } = req.query;
+    const dateCondition = buildDateCondition(period, offset);
 
     // 1. Monthly trend data (for charts)
     const trendSql = `
