@@ -85,10 +85,10 @@ const FinancialYearMain = () => {
       >
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-            <CalendarMonthIcon sx={{ fontSize: 28 }} />
-            <Typography variant="h5" fontWeight="bold">Financial Year Management</Typography>
+            <CalendarMonthIcon sx={{ fontSize: 28, color: 'white' }} />
+            <Typography variant="h5" fontWeight="bold" color="white">Financial Year Management</Typography>
           </Box>
-          <Typography variant="body2" sx={{ opacity: 0.85, maxWidth: 520 }}>
+          <Typography variant="body2" color="white" sx={{ opacity: 0.85, maxWidth: 520 }}>
             Configure and manage your financial years. Activate the current year, add new ones, and configure document numbering series.
           </Typography>
           <Box sx={{ mt: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -110,26 +110,10 @@ const FinancialYearMain = () => {
             >
               Add New Financial Year
             </Button>
-            <Button
-              variant="outlined"
-              startIcon={<SettingsIcon />}
-              onClick={() => navigate('/add-financial-year-settings')}
-              sx={{
-                color: 'white',
-                fontWeight: 'bold',
-                textTransform: 'none',
-                borderRadius: '12px',
-                px: 3, py: 1,
-                borderColor: 'rgba(255,255,255,0.3)',
-                '&:hover': { borderColor: 'rgba(255,255,255,0.5)', bgcolor: 'rgba(255,255,255,0.08)' },
-              }}
-            >
-              Year Settings
-            </Button>
           </Box>
         </Box>
         <Box sx={{ position: 'absolute', right: -20, top: -20, opacity: 0.06 }}>
-          <CalendarMonthIcon sx={{ fontSize: 200 }} />
+          <CalendarMonthIcon sx={{ fontSize: 200, color: 'white' }} />
         </Box>
       </Paper>
 

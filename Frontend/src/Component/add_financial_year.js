@@ -113,11 +113,11 @@ const AddFinancialYear = () => {
             display: 'flex', alignItems: 'center', gap: 2,
           }}>
             <Box sx={{ p: 1.5, borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.12)' }}>
-              <CalendarMonthIcon sx={{ fontSize: 28 }} />
+              <CalendarMonthIcon sx={{ fontSize: 28, color: 'white' }} />
             </Box>
             <Box>
-              <Typography variant="h6" fontWeight="bold">Add New Financial Year</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              <Typography variant="h6" fontWeight="bold" color="white">Add New Financial Year</Typography>
+              <Typography variant="body2" color="white" sx={{ opacity: 0.8 }}>
                 Set the start date and the end date will be auto-calculated
               </Typography>
             </Box>
