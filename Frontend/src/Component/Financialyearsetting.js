@@ -14,6 +14,7 @@ import {
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import SettingsIcon from '@mui/icons-material/Settings';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
